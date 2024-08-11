@@ -12,7 +12,7 @@ enum {
 void str_init(struct str_t *str)
 {
     str->data = malloc(min_str_size);
-    str->max_size = min_str_size;
+    str->size = min_str_size;
     str_clear(str);
 }
 
@@ -20,8 +20,8 @@ void str_init(struct str_t *str)
 void str_del(struct str_t *str)
 {
     free(str->data);
+    str->len = 0;
     str->size = 0;
-    str->max_size = 0;
     str->data = NULL;
 }
 
@@ -29,13 +29,13 @@ void str_del(struct str_t *str)
 void str_clear(struct str_t *str)
 {
     str->data[0] = '\0';
-    str->size = 0;
+    str->len = 0;
 }
 
 
 static int str_is_full(struct str_t *str)
 {
-    return str->size + 1 == str->max_size;
+    return str->len + 1 == str->size;
 }
 
 
@@ -43,8 +43,8 @@ static void str_resize(struct str_t *str)
 {
     char *tmp = str->data;
 
-    str->max_size *= 2;
-    str->data = malloc(str->max_size);
+    str->size *= 2;
+    str->data = malloc(str->size);
     strcpy(str->data, tmp);
 
     free(tmp);
@@ -56,7 +56,7 @@ void str_append(char c, struct str_t *str)
     if (str_is_full(str)) {
         str_resize(str);
     }
-    str->data[str->size] = c;
-    str->size++;
-    str->data[str->size] = '\0';
+    str->data[str->len] = c;
+    str->len++;
+    str->data[str->len] = '\0';
 }

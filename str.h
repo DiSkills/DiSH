@@ -2,8 +2,8 @@
 #define STR_H
 
 struct str_t {
-    unsigned size,
-             max_size;
+    unsigned len,
+             size;
     char *data;
 };
 

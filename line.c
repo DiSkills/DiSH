@@ -42,7 +42,7 @@ static void line_add_char(char c, struct line_t *line)
 static void line_add_word(struct line_t *line)
 {
     struct word_item *tmp = malloc(sizeof(struct word_item));
-    tmp->word = malloc(line->current_word.size + 1);
+    tmp->word = malloc(line->current_word.len + 1);
     strcpy(tmp->word, line->current_word.data);
     tmp->next = NULL;
 
@@ -70,7 +70,7 @@ void line_process_char(char c, struct line_t *line)
 
     if (line->mode == mode_all || !is_space(c)) {
         line_add_char(c, line);
-    } else if (line->current_word.size) {
+    } else if (line->current_word.len) {
         line_add_word(line);
         line_clear_word(line);
     }
