@@ -7,7 +7,7 @@ CFLAGS = -ggdb -Wall -ansi -pedantic
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-prog: main.c $(OBJMODULES)
+dish: main.c $(OBJMODULES)
 	$(CC) $(CFLAGS) $^ -o $@
 
 ifneq (clean, $(MAKECMDGOALS))
@@ -18,4 +18,4 @@ deps.mk: $(SRCMODULES)
 	$(CC) -MM $^ > $@
 
 clean:
-	rm -f *.o prog deps.mk
+	rm -f *.o dish deps.mk
