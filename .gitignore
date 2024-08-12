@@ -1,3 +1,4 @@
-**/*.o
-**/tags
-**/deps.mk
+obj/*
+tags
+deps.mk
+dish
