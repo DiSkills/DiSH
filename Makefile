@@ -7,11 +7,6 @@ SRCS = $(addprefix $(SRCDIR)/,$(SRCMODULES))
 OBJDIR = obj
 OBJS = $(addprefix $(OBJDIR)/,$(SRCMODULES:.c=.o))
 
-TESTDIR = test
-TESTBUILDDIR = $(TESTDIR)/build
-TESTMODULES = test_str.c test_line.c
-TESTS = $(addprefix $(TESTBUILDDIR)/,$(TESTMODULES:%.c=%))
-
 CC = gcc
 CFLAGS = -ggdb -Wall -ansi -pedantic
 
@@ -33,16 +28,7 @@ $(OBJS): | $(OBJDIR)
 $(OBJDIR):
 	mkdir -p $@
 
-$(TESTBUILDDIR)/%: $(TESTDIR)/%.c $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
-
-$(TESTS): | $(TESTBUILDDIR)
-
-$(TESTBUILDDIR):
-	mkdir -p $@
-
-test: $(TESTS)
-	for test in $^; do ./$$test; done
-
 clean:
 	rm -rf $(OBJDIR) $(TARGET) deps.mk $(TESTBUILDDIR)
+
+include Makefile.test
