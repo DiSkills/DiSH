@@ -33,7 +33,7 @@ void str_clear(struct str_t *str)
 }
 
 
-static int str_is_full(struct str_t *str)
+static int str_is_full(const struct str_t *str)
 {
     return str->len + 1 == str->size;
 }
