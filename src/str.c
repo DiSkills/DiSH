@@ -41,13 +41,8 @@ static int str_is_full(const struct str_t *str)
 
 static void str_resize(struct str_t *str)
 {
-    char *tmp = str->data;
-
     str->size *= 2;
-    str->data = malloc(str->size);
-    strcpy(str->data, tmp);
-
-    free(tmp);
+    str->data = realloc(str->data, str->size);
 }
 
 
