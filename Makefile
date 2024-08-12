@@ -9,7 +9,7 @@ OBJS = $(addprefix $(OBJDIR)/,$(SRCMODULES:.c=.o))
 
 TESTDIR = test
 TESTBUILDDIR = $(TESTDIR)/build
-TESTMODULES = test_str.c
+TESTMODULES = test_str.c test_line.c
 TESTS = $(addprefix $(TESTBUILDDIR)/,$(TESTMODULES:%.c=%))
 
 CC = gcc
