@@ -1,7 +1,7 @@
 TARGET = dish
 
 SRCDIR = src
-SRCMODULES = str.c wordlist.c
+SRCMODULES = str.c wordlist.c line.c
 SRCS = $(addprefix $(SRCDIR)/,$(SRCMODULES))
 
 OBJDIR = obj

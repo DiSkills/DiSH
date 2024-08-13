@@ -1,6 +1,6 @@
 TESTDIR = test
 TESTBUILDDIR = $(TESTDIR)/build
-TESTMODULES = test_str.c test_wordlist.c
+TESTMODULES = test_str.c test_wordlist.c test_line.c
 TESTS = $(addprefix $(TESTBUILDDIR)/,$(TESTMODULES:%.c=%))
 
 $(TESTBUILDDIR)/%: $(TESTDIR)/%.c $(OBJS)
