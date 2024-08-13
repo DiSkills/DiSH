@@ -9,6 +9,15 @@ enum {
 };
 
 
+void str_init_from_array(struct str_t *str, const char *s)
+{
+    str->len = strlen(s);
+    str->size = str->len + 1;
+    str->data = malloc(str->size);
+    strcpy(str->data, s);
+}
+
+
 void str_init(struct str_t *str)
 {
     str->data = malloc(min_str_size);
@@ -46,7 +55,7 @@ static void str_resize(struct str_t *str)
 }
 
 
-void str_append(char c, struct str_t *str)
+void str_append(struct str_t *str, char c)
 {
     if (str_is_full(str)) {
         str_resize(str);

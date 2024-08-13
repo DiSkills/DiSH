@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
@@ -8,80 +7,101 @@
 typedef void (*test_func)();
 
 
-static char *create_str(const char *str)
+static void test_init_from_array()
 {
-    char *new_str = malloc(strlen(str) + 1);
-    strcpy(new_str, str);
-    return new_str;
+    const char *hello = "Hello, World!";
+    struct str_t str = { 2, 3, "Hi" };
+
+    str_init_from_array(&str, hello);
+    assert(str.len == 13);
+    assert(str.size == 14);
+    assert(str.data != hello);
+    assert(strcmp(str.data, hello) == 0);
+
+    str_del(&str);
 }
 
 
 static void test_init()
 {
-    struct str_t str = {3, 4, "Hello, World!"};
-    str_init(&str);
+    struct str_t str = {13, 14, "Hello, World!"};
 
+    str_init(&str);
     assert(str.len == 0);
     assert(str.size == 16);
     assert(str.data != NULL);
     assert(strlen(str.data) == 0);
 
-    free(str.data);
+    str_del(&str);
 }
 
 
 static void test_clear()
 {
     struct str_t str;
-    str.data = create_str("Hello, World!");
-    str.len = strlen(str.data);
-    str.size = str.len + 1;
+    str_init_from_array(&str, "Hello, World!");
 
     str_clear(&str);
-
     assert(str.len == 0);
     assert(str.size == 14);
+    assert(str.data != NULL);
     assert(strlen(str.data) == 0);
 
-    free(str.data);
+    str_del(&str);
 }
 
 
 static void test_del()
 {
     struct str_t str;
-    str.data = create_str("Hello, World!");
-    str.len = strlen(str.data);
-    str.size = str.len + 1;
+    str_init_from_array(&str, "Hello, World!");
 
     str_del(&str);
-
     assert(str.len == 0);
     assert(str.size == 0);
     assert(str.data == NULL);
 }
 
 
-static void test_append()
+static void test_append_one_char_to_empty_str()
 {
-    int i;
     struct str_t str;
-    const char hello[] = "Hello, my name is DiSkills";
     str_init(&str);
 
-    for (i = 0; i < 15; i++) {
-        str_append(hello[i], &str);
-    }
-    assert(str.len == 15);
+    str_append(&str, 'a');
+    assert(str.len == 1);
     assert(str.size == 16);
-    assert(strcmp(str.data, "Hello, my name ") == 0);
+    assert(strcmp(str.data, "a") == 0);
 
-    for (; i < sizeof(hello) - 1; i++) {
-        str_append(hello[i], &str);
-    }
-    assert(str.len == strlen(hello));
-    assert(str.size == 32);
-    assert(strcmp(str.data, hello) == 0);
+    str_del(&str);
+}
+
+
+static void test_append_check_line_correctness()
+{
+    struct str_t str;
+    str_init_from_array(&str, "Hello, World!");
+    str_clear(&str);
+
+    /* str is empty, but memory contains garbage */
+    str_append(&str, 'a');
+    assert(str.len == 1);
+    assert(str.size == 14);
+    assert(strcmp(str.data, "a") == 0);
+
+    str_del(&str);
+}
+
+
+static void test_append_check_resize()
+{
+    struct str_t str;
+    str_init_from_array(&str, "Hi");
+
+    str_append(&str, '!');
+    assert(str.len == 3);
+    assert(str.size == 6);
+    assert(strcmp(str.data, "Hi!") == 0);
 
     str_del(&str);
 }
@@ -91,7 +111,13 @@ int main()
 {
     int i;
     test_func tests[] = {
-        test_init, test_clear, test_del, test_append
+        test_init_from_array,
+        test_init,
+        test_clear,
+        test_del,
+        test_append_one_char_to_empty_str,
+        test_append_check_line_correctness,
+        test_append_check_resize
     };
     for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
         tests[i]();
