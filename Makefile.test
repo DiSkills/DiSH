@@ -11,5 +11,8 @@ $(TESTS): | $(TESTBUILDDIR)
 $(TESTBUILDDIR):
 	mkdir -p $@
 
-test: $(TESTS)
+unittests: $(TESTS)
 	for test in $^; do ./$$test; done
+
+test: unittests $(TARGET)
+	./test_dish.sh $(TARGET) $(TESTDIR)/data
