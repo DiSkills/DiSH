@@ -3,16 +3,16 @@
 #include "line.h"
 
 
-static const char welcome_msg[] = "> ";
+static const char msg_welcome[] = ">";
 
-static const char error_msg[] = "Error:";
-static const char error_msg_quotes[] = "unmatched quotes";
+static const char msg_error[] = "Error:";
+static const char msg_error_quotes[] = "unmatched quotes";
 
 
 static void line_print(struct line_t *line)
 {
-    struct word_item *p;
-    for (p = line->first; p; p = p->next) {
+    struct wordlist_item *p;
+    for (p = line->wordlist.first; p; p = p->next) {
         printf("[%s]\n", p->word);
     }
 }
@@ -21,10 +21,10 @@ static void line_print(struct line_t *line)
 static void line_print_error(struct line_t *line)
 {
     const char *error;
-    if (line->state == state_unmatched_quotes) {
-        error = error_msg_quotes;
+    if (line->errno == error_quotes) {
+        error = msg_error_quotes;
     }
-    fprintf(stderr, "%s %s\n", error_msg, error);
+    fprintf(stderr, "%s %s\n", msg_error, error);
 }
 
 
@@ -34,20 +34,21 @@ int main()
     struct line_t line;
 
     line_init(&line);
-    printf("%s", welcome_msg);
+    printf("%s ", msg_welcome);
     while ((c = getchar()) != EOF) {
-        line_process_char(c, &line);
-        if (line.state == state_ok) {
+        line_process_char(&line, c);
+
+        if (!line.is_finished) {
             continue;
         }
-        if (line.state == state_finished) {
-            line_print(&line);
-        } else {
-            line_print_error(&line);
-        }
 
+        if (line.errno != noerror) {
+            line_print_error(&line);
+        } else {
+            line_print(&line);
+        }
         line_clear(&line);
-        printf("%s", welcome_msg);
+        printf("%s ", msg_welcome);
     }
     line_del(&line);
     return 0;
