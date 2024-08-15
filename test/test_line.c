@@ -246,6 +246,65 @@ static void test_process_char_add_word()
 }
 
 
+static void test_process_line_correctly()
+{
+    int i;
+    const char s[] = "abra" " " "sch\"wa\"bra\" \"kadabra"
+                         "\t" "foo\"\tb\"ar" "\n";
+    struct wordlist_item *item;
+    struct line_t line;
+    line_init(&line);
+
+    for (i = 0; i < sizeof(s) - 1; i++) {
+        line_process_char(&line, s[i]);
+    }
+    assert_line(&line, 1, 0, noerror, mode_split);
+    assert(line.current_word.len == 0);
+    assert(line.current_word.size == 32);
+    assert(strlen(line.current_word.data) == 0);
+
+    item = line.wordlist.first;
+    assert(strcmp(item->word, "abra") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "schwabra kadabra") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "foo\tbar") == 0);
+    assert(item->next == NULL);
+
+    line_del(&line);
+}
+
+
+static void test_process_line_error_unmatched_quotes()
+{
+    int i;
+    const char s[] = "abra" " " "\"schwabra kadabra\""
+                     "\t" "\"foo" "\n";
+    struct wordlist_item *item;
+    struct line_t line;
+    line_init(&line);
+
+    for (i = 0; i < sizeof(s) - 1; i++) {
+        line_process_char(&line, s[i]);
+    }
+    assert_line(&line, 1, 0, error_quotes, mode_nosplit);
+    assert(line.current_word.len == 4);
+    assert(line.current_word.size == 32);
+    assert(strcmp(line.current_word.data, "foo\n") == 0);
+
+    item = line.wordlist.first;
+    assert(strcmp(item->word, "abra") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "schwabra kadabra") == 0);
+    assert(item->next == NULL);
+
+    line_del(&line);
+}
+
+
 int main()
 {
     int i;
@@ -259,7 +318,9 @@ int main()
         test_process_char_add_symbol,
         test_process_char_mark_end_of_line,
         test_process_char_error_unmatched_quotes,
-        test_process_char_add_word
+        test_process_char_add_word,
+        test_process_line_correctly,
+        test_process_line_error_unmatched_quotes
     };
     for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
         tests[i]();
