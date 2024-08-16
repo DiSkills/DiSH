@@ -63,7 +63,7 @@ static void test_clear()
 }
 
 
-static void test_process_line_correctly()
+static void test_process_correctly()
 {
     int i;
     const char s[] = "abra" " " "sch\"wa\"bra\" \"kadabra"
@@ -72,7 +72,7 @@ static void test_process_line_correctly()
     struct line_t line;
     line_init(&line);
 
-    for (i = 0; i < sizeof(s) - 1; i++) {
+    for (i = 0; s[i]; i++) {
         line_process_char(&line, s[i]);
     }
     assert_line(line, 1, 0, noerror, mode_split);
@@ -94,7 +94,7 @@ static void test_process_line_correctly()
 }
 
 
-static void test_process_line_error_unmatched_quotes()
+static void test_process_error_unmatched_quotes()
 {
     int i;
     const char s[] = "abra" " " "\"schwabra kadabra\""
@@ -103,7 +103,7 @@ static void test_process_line_error_unmatched_quotes()
     struct line_t line;
     line_init(&line);
 
-    for (i = 0; i < sizeof(s) - 1; i++) {
+    for (i = 0; s[i]; i++) {
         line_process_char(&line, s[i]);
     }
     assert_line(line, 1, 0, error_quotes, mode_nosplit);
@@ -127,8 +127,10 @@ int main()
     int i;
     test_func tests[] = {
         test_init, test_del, test_clear,
-        test_process_line_correctly,
-        test_process_line_error_unmatched_quotes
+
+        test_process_correctly,
+
+        test_process_error_unmatched_quotes
     };
     for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
         tests[i]();
