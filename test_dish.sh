@@ -13,8 +13,8 @@ while read test_name; do
         echo "TEST $test_name FAILED: expected \"$expected\", got \"$result\""
     fi
 done <<END
-    test1_only_1_cmd
-    test2_only_1_cmd
-    test3_only_1_cmd
-    test_many_cmds
+    split_mode
+    nosplit_mode
+    many
+    error_unmatched_quotes
 END
