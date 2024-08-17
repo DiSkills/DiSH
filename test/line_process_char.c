@@ -138,6 +138,62 @@ static void test_add_symbol()
 }
 
 
+static void test_add_quotes()
+{
+    struct line_t line;
+    line_init(&line);
+
+    /* split */
+    line.is_escaped = 1;
+    line_process_char(&line, '"');
+    assert_line(line, 0, 0, noerror, mode_split);
+
+    assert(line.current_word.len == 1);
+    assert(strcmp(line.current_word.data, "\"") == 0);
+    assert_wordlist_is_empty(line);
+
+    /* nosplit */
+    line.is_escaped = 1;
+    line.mode = mode_nosplit;
+    line_process_char(&line, '"');
+    assert_line(line, 0, 0, noerror, mode_nosplit);
+
+    assert(line.current_word.len == 2);
+    assert(strcmp(line.current_word.data, "\"\"") == 0);
+    assert_wordlist_is_empty(line);
+
+    line_del(&line);
+}
+
+
+static void test_add_backslash()
+{
+    struct line_t line;
+    line_init(&line);
+
+    /* split */
+    line.is_escaped = 1;
+    line_process_char(&line, '\\');
+    assert_line(line, 0, 0, noerror, mode_split);
+
+    assert(line.current_word.len == 1);
+    assert(strcmp(line.current_word.data, "\\") == 0);
+    assert_wordlist_is_empty(line);
+
+    /* nosplit */
+    line.is_escaped = 1;
+    line.mode = mode_nosplit;
+    line_process_char(&line, '\\');
+    assert_line(line, 0, 0, noerror, mode_nosplit);
+
+    assert(line.current_word.len == 2);
+    assert(strcmp(line.current_word.data, "\\\\") == 0);
+    assert_wordlist_is_empty(line);
+
+    line_del(&line);
+}
+
+
 static void test_add_word_using_separator(char separator)
 {
     int i;
@@ -199,6 +255,8 @@ int main()
 
         test_add_spaces,
         test_add_symbol,
+        test_add_quotes,
+        test_add_backslash,
 
         test_add_word,
 
