@@ -30,6 +30,43 @@ static void test_toggle_split_mode()
 }
 
 
+static void test_set_is_escaped()
+{
+    struct line_t line;
+    line_init(&line);
+
+    /* split */
+    line_process_char(&line, '\\');
+    assert_line(line, 0, 1, noerror, mode_split);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    /* nosplit */
+    line_clear(&line);
+    line.mode = mode_nosplit;
+    line_process_char(&line, '\\');
+    assert_line(line, 0, 1, noerror, mode_nosplit);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    line_del(&line);
+}
+
+
+static void test_mark_end_of_line()
+{
+    struct line_t line;
+    line_init(&line);
+
+    line_process_char(&line, '\n');
+    assert_line(line, 1, 0, noerror, mode_split);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    line_del(&line);
+}
+
+
 static void test_ignore_spaces()
 {
     struct line_t line;
@@ -101,30 +138,56 @@ static void test_add_symbol()
 }
 
 
-static void test_mark_end_of_line()
+static void test_add_quotes()
 {
     struct line_t line;
     line_init(&line);
 
-    line_process_char(&line, '\n');
-    assert_line(line, 1, 0, noerror, mode_split);
-    assert_word_is_default(line);
+    /* split */
+    line.is_escaped = 1;
+    line_process_char(&line, '"');
+    assert_line(line, 0, 0, noerror, mode_split);
+
+    assert(line.current_word.len == 1);
+    assert(strcmp(line.current_word.data, "\"") == 0);
+    assert_wordlist_is_empty(line);
+
+    /* nosplit */
+    line.is_escaped = 1;
+    line.mode = mode_nosplit;
+    line_process_char(&line, '"');
+    assert_line(line, 0, 0, noerror, mode_nosplit);
+
+    assert(line.current_word.len == 2);
+    assert(strcmp(line.current_word.data, "\"\"") == 0);
     assert_wordlist_is_empty(line);
 
     line_del(&line);
 }
 
 
-static void test_error_unmatched_quotes()
+static void test_add_backslash()
 {
     struct line_t line;
     line_init(&line);
-    line.mode = mode_nosplit;
 
-    line_process_char(&line, '\n');
-    assert_line(line, 1, 0, error_quotes, mode_nosplit);
+    /* split */
+    line.is_escaped = 1;
+    line_process_char(&line, '\\');
+    assert_line(line, 0, 0, noerror, mode_split);
+
     assert(line.current_word.len == 1);
-    assert(strcmp(line.current_word.data, "\n") == 0);
+    assert(strcmp(line.current_word.data, "\\") == 0);
+    assert_wordlist_is_empty(line);
+
+    /* nosplit */
+    line.is_escaped = 1;
+    line.mode = mode_nosplit;
+    line_process_char(&line, '\\');
+    assert_line(line, 0, 0, noerror, mode_nosplit);
+
+    assert(line.current_word.len == 2);
+    assert(strcmp(line.current_word.data, "\\\\") == 0);
     assert_wordlist_is_empty(line);
 
     line_del(&line);
@@ -164,21 +227,68 @@ static void test_add_word()
 }
 
 
+static void test_error_quotes()
+{
+    struct line_t line;
+    line_init(&line);
+    line.mode = mode_nosplit;
+
+    line_process_char(&line, '\n');
+    assert_line(line, 1, 0, error_quotes, mode_nosplit);
+    assert(line.current_word.len == 1);
+    assert(strcmp(line.current_word.data, "\n") == 0);
+    assert_wordlist_is_empty(line);
+
+    line_del(&line);
+}
+
+
+static void test_error_escape()
+{
+    struct line_t line;
+    line_init(&line);
+
+    /* split */
+    line.is_escaped = 1;
+
+    line_process_char(&line, '?');
+    assert_line(line, 0, 1, error_escape, mode_split);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    /* nosplit */
+    line_clear(&line);
+    line.mode = mode_nosplit;
+    line.is_escaped = 1;
+
+    line_process_char(&line, '?');
+    assert_line(line, 0, 1, error_escape, mode_nosplit);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    line_del(&line);
+}
+
+
 int main()
 {
     int i;
     test_func tests[] = {
         test_toggle_split_mode,
+        test_set_is_escaped,
         test_mark_end_of_line,
 
         test_ignore_spaces,
 
         test_add_spaces,
         test_add_symbol,
+        test_add_quotes,
+        test_add_backslash,
 
         test_add_word,
 
-        test_error_unmatched_quotes
+        test_error_quotes,
+        test_error_escape
     };
     for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
         tests[i]();

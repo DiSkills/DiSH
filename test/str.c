@@ -77,7 +77,7 @@ static void test_append_one_char_to_empty_str()
 }
 
 
-static void test_append_check_line_correctness()
+static void test_append_check_correctness()
 {
     struct str_t str;
     str_init_from_array(&str, "Hello, World!");
@@ -116,7 +116,7 @@ int main()
         test_clear,
         test_del,
         test_append_one_char_to_empty_str,
-        test_append_check_line_correctness,
+        test_append_check_correctness,
         test_append_check_resize
     };
     for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
