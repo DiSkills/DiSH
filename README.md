@@ -1,4 +1,13 @@
-# DiSH is a simple command interpreter.
+# DiSH is a simple command interpreter
 
 ### Features:
-  - [x] Print words from the input string. The quote symbol toggles the mode for entering whitespace characters. An odd number of quotes results in an error.
+  - [x] Input of commands
+  - [x] Output words from the command in the format: \[word]
+
+#### Special chars:
+  * " - toggles the reading mode for whitespace chars
+  * \ - escapes the next char (" or \)
+
+#### Errors:
+  * Unmatched quotes
+  * Unsupported escape sequence
