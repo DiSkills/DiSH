@@ -6,7 +6,7 @@
 
 #### Special chars:
   * " - toggles the reading mode for whitespace chars
-  * \ - escapes the next char (" or \)
+  * \\ - escapes the next char (" or \\)
 
 #### Errors:
   * Unmatched quotes
