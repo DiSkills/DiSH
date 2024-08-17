@@ -99,7 +99,7 @@ static void test_process_escape_sequence_correctly()
     int i;
     /* It\"s the \\correct\\ "\"escape\" sequence" */
     const char s[] =
-        "It\\\"s the \\\\correct\\\\ \"\\\"escape\\\" sequence\"";
+        "It\\\"s the \\\\correct\\\\ \"\\\"escape\\\" sequence\"\n";
     struct wordlist_item *item;
     struct line_t line;
     line_init(&line);
@@ -108,7 +108,9 @@ static void test_process_escape_sequence_correctly()
         line_process_char(&line, s[i]);
     }
     assert_line(line, 1, 0, noerror, mode_split);
-    assert_word_is_default(line);
+    assert(line.current_word.len == 0);
+    assert(line.current_word.size == 32);
+    assert(strlen(line.current_word.data) == 0);
 
     item = line.wordlist.first;
     assert(strcmp(item->word, "It\"s") == 0);
@@ -159,7 +161,7 @@ static void test_process_error_unsupported_escape_sequence()
 {
     int i;
     /* It's \"an\" unsupported\? escape sequence */
-    const char s[] = "It's \\\"an\\\" unsupported\\? escape sequence";
+    const char s[] = "It's \\\"an\\\" unsupported\\? escape sequence\n";
     struct wordlist_item *item;
     struct line_t line;
     line_init(&line);
@@ -187,7 +189,7 @@ static void test_process_check_to_save_first_error()
 {
     int i;
     /* check "to save\? the first error */
-    const char s[] = "check \"to save\\? the first error";
+    const char s[] = "check \"to save\\? the first error\n";
     struct wordlist_item *item;
     struct line_t line;
     line_init(&line);

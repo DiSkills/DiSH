@@ -270,6 +270,21 @@ static void test_error_escape()
 }
 
 
+static void test_error_escape_new_line()
+{
+    struct line_t line;
+    line_init(&line);
+    line.is_escaped = 1;
+
+    line_process_char(&line, '\n');
+    assert_line(line, 1, 1, error_escape, mode_split);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    line_del(&line);
+}
+
+
 int main()
 {
     int i;
@@ -288,7 +303,8 @@ int main()
         test_add_word,
 
         test_error_quotes,
-        test_error_escape
+        test_error_escape,
+        test_error_escape_new_line
     };
     for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
         tests[i]();
