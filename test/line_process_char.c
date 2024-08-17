@@ -227,7 +227,7 @@ static void test_add_word()
 }
 
 
-static void test_error_unmatched_quotes()
+static void test_error_quotes()
 {
     struct line_t line;
     line_init(&line);
@@ -237,6 +237,33 @@ static void test_error_unmatched_quotes()
     assert_line(line, 1, 0, error_quotes, mode_nosplit);
     assert(line.current_word.len == 1);
     assert(strcmp(line.current_word.data, "\n") == 0);
+    assert_wordlist_is_empty(line);
+
+    line_del(&line);
+}
+
+
+static void test_error_escape()
+{
+    struct line_t line;
+    line_init(&line);
+
+    /* split */
+    line.is_escaped = 1;
+
+    line_process_char(&line, '?');
+    assert_line(line, 0, 1, error_escape, mode_split);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    /* nosplit */
+    line_clear(&line);
+    line.mode = mode_nosplit;
+    line.is_escaped = 1;
+
+    line_process_char(&line, '?');
+    assert_line(line, 0, 1, error_escape, mode_nosplit);
+    assert_word_is_default(line);
     assert_wordlist_is_empty(line);
 
     line_del(&line);
@@ -260,7 +287,8 @@ int main()
 
         test_add_word,
 
-        test_error_unmatched_quotes
+        test_error_quotes,
+        test_error_escape
     };
     for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
         tests[i]();
