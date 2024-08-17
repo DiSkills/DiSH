@@ -66,8 +66,8 @@ static void test_clear()
 static void test_process_correctly()
 {
     int i;
-    const char s[] = "abra" " " "sch\"wa\"bra\" \"kadabra"
-                         "\t" "foo\"\tb\"ar" "\n";
+    /* abra sch"wa"bra" "kadabra    foo"    b"ar */
+    const char s[] = "abra sch\"wa\"bra\" \"kadabra\tfoo\"\tb\"ar\n";
     struct wordlist_item *item;
     struct line_t line;
     line_init(&line);
@@ -94,11 +94,44 @@ static void test_process_correctly()
 }
 
 
+static void test_process_escape_sequence_correctly()
+{
+    int i;
+    /* It\"s the \\correct\\ "\"escape\" sequence" */
+    const char s[] =
+        "It\\\"s the \\\\correct\\\\ \"\\\"escape\\\" sequence\"";
+    struct wordlist_item *item;
+    struct line_t line;
+    line_init(&line);
+
+    for (i = 0; s[i]; i++) {
+        line_process_char(&line, s[i]);
+    }
+    assert_line(line, 1, 0, noerror, mode_split);
+    assert_word_is_default(line);
+
+    item = line.wordlist.first;
+    assert(strcmp(item->word, "It\"s") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "the") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "\\correct\\") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "\"escape\" sequence") == 0);
+    assert(item->next == NULL);
+
+    line_del(&line);
+}
+
+
 static void test_process_error_unmatched_quotes()
 {
     int i;
-    const char s[] = "abra" " " "\"schwabra kadabra\""
-                     "\t" "\"foo" "\n";
+    /* abra "schwabra kadabra"  "foo */
+    const char s[] = "abra \"schwabra kadabra\"\t\"foo\n";
     struct wordlist_item *item;
     struct line_t line;
     line_init(&line);
@@ -122,6 +155,59 @@ static void test_process_error_unmatched_quotes()
 }
 
 
+static void test_process_error_unsupported_escape_sequence()
+{
+    int i;
+    /* It's \"an\" unsupported\? escape sequence */
+    const char s[] = "It's \\\"an\\\" unsupported\\? escape sequence";
+    struct wordlist_item *item;
+    struct line_t line;
+    line_init(&line);
+
+    for (i = 0; s[i]; i++) {
+        line_process_char(&line, s[i]);
+    }
+    assert_line(line, 1, 1, error_escape, mode_split);
+    assert(line.current_word.len == 11);
+    assert(line.current_word.size == 16);
+    assert(strcmp(line.current_word.data, "unsupported") == 0);
+
+    item = line.wordlist.first;
+    assert(strcmp(item->word, "It's") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "\"an\"") == 0);
+    assert(item->next == NULL);
+
+    line_del(&line);
+}
+
+
+static void test_process_check_to_save_first_error()
+{
+    int i;
+    /* check "to save\? the first error */
+    const char s[] = "check \"to save\\? the first error";
+    struct wordlist_item *item;
+    struct line_t line;
+    line_init(&line);
+
+    for (i = 0; s[i]; i++) {
+        line_process_char(&line, s[i]);
+    }
+    assert_line(line, 1, 1, error_escape, mode_nosplit);
+    assert(line.current_word.len == 7);
+    assert(line.current_word.size == 16);
+    assert(strcmp(line.current_word.data, "to save") == 0);
+
+    item = line.wordlist.first;
+    assert(strcmp(item->word, "check") == 0);
+    assert(item->next == NULL);
+
+    line_del(&line);
+}
+
+
 int main()
 {
     int i;
@@ -129,8 +215,12 @@ int main()
         test_init, test_del, test_clear,
 
         test_process_correctly,
+        test_process_escape_sequence_correctly,
 
-        test_process_error_unmatched_quotes
+        test_process_error_unmatched_quotes,
+        test_process_error_unsupported_escape_sequence,
+
+        test_process_check_to_save_first_error
     };
     for (i = 0; i < sizeof(tests) / sizeof(*tests); i++) {
         tests[i]();
