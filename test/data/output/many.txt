@@ -6,10 +6,13 @@
 [kadabra]
 > [abra]
 [schwabra kadabra]
-[foo    bar]
+["foo    bar"]
+> Error: unsupported escape sequence
 > [abra]
 [schwabra kadabra]
 [foo  bar]
 > Error: unmatched quotes
 > [abraschwabrakadabra]
+> Error: unsupported escape sequence
+> [abra]
 > 

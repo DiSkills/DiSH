@@ -11,7 +11,8 @@ enum line_split_modes {
 
 enum line_errors {
     noerror = 0,
-    error_quotes = -1
+    error_quotes = -1,
+    error_escape = -2
 };
 
 struct line_t {
