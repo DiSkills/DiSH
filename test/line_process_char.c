@@ -274,10 +274,22 @@ static void test_error_escape_new_line()
 {
     struct line_t line;
     line_init(&line);
+
+    /* split */
     line.is_escaped = 1;
 
     line_process_char(&line, '\n');
     assert_line(line, 1, 1, error_escape, mode_split);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    /* nosplit */
+    line_clear(&line);
+    line.mode = mode_nosplit;
+    line.is_escaped = 1;
+
+    line_process_char(&line, '\n');
+    assert_line(line, 1, 1, error_escape, mode_nosplit);
     assert_word_is_default(line);
     assert_wordlist_is_empty(line);
 
