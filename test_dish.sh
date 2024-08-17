@@ -13,8 +13,11 @@ while read test_name; do
         echo "TEST $test_name FAILED: expected \"$expected\", got \"$result\""
     fi
 done <<END
-    split_mode
-    nosplit_mode
-    many
+    error_escape_new_line
     error_unmatched_quotes
+    error_unsupported_escape_sequence
+    escape_sequence
+    many
+    nosplit_mode
+    split_mode
 END
