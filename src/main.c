@@ -7,6 +7,7 @@ static const char msg_welcome[] = ">";
 
 static const char msg_error[] = "Error:";
 static const char msg_error_quotes[] = "unmatched quotes";
+static const char msg_error_escape[] = "unsupported escape sequence";
 
 
 static void line_print(struct line_t *line)
@@ -21,8 +22,15 @@ static void line_print(struct line_t *line)
 static void line_print_error(struct line_t *line)
 {
     const char *error;
-    if (line->errno == error_quotes) {
-        error = msg_error_quotes;
+    switch (line->errno) {
+        case error_quotes:
+            error = msg_error_quotes;
+            break;
+        case error_escape:
+            error = msg_error_escape;
+            break;
+        case noerror:
+            return;
     }
     fprintf(stderr, "%s %s\n", msg_error, error);
 }

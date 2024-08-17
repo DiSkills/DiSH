@@ -23,18 +23,28 @@ static void line_toggle_split_mode(struct line_t *line)
 }
 
 
-static void line_set_is_finished(struct line_t *line)
+static void line_set_error(struct line_t *line, enum line_errors error)
 {
-    if (line->mode == mode_nosplit) {
-        line->errno = error_quotes;
-    }
-    line->is_finished = 1;
+    line->errno = error;
 }
 
 
 static void line_add_char(struct line_t *line, char c)
 {
     str_append(&line->current_word, c);
+}
+
+
+static void line_escape_char(struct line_t *line, char c)
+{
+    switch (c) {
+        case '\\':
+        case '"':
+            line_add_char(line, c);
+            line->is_escaped = 0;
+            return;
+    }
+    line_set_error(line, error_escape);
 }
 
 
@@ -52,6 +62,24 @@ static void line_clear_word(struct line_t *line)
 
 void line_process_char(struct line_t *line, char c)
 {
+    if (c == '\n') {
+        line->is_finished = 1;
+    }
+
+    if (line->errno != noerror) {
+        return;
+    }
+
+    if (line->is_escaped) {
+        line_escape_char(line, c);
+        return;
+    }
+
+    if (c == '\\') {
+        line->is_escaped = 1;
+        return;
+    }
+
     if (c == '"') {
         line_toggle_split_mode(line);
         return;
@@ -64,8 +92,8 @@ void line_process_char(struct line_t *line, char c)
         line_clear_word(line);
     }
 
-    if (c == '\n') {
-        line_set_is_finished(line);
+    if (line->is_finished && line->mode == mode_nosplit) {
+        line_set_error(line, error_quotes);
     }
 }
 
