@@ -2,10 +2,10 @@
 
 ### Features:
   - [x] Input of commands
-  - [x] Output words from the command in the format: \[word]
+  - [x] Output arguments in the format: \[argument]
 
 #### Special chars:
-  * " - toggles the reading mode for whitespace chars
+  * " - toggles the argument splitting mode (text inside is one argument)
   * \\ - escapes the next char (" or \\)
 
 #### Errors:
