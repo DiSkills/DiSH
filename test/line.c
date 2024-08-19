@@ -14,6 +14,7 @@ static void fill_line(struct line_t *line, int is_finished, int is_escaped,
 {
     line->is_finished = is_finished;
     line->is_escaped = is_escaped;
+    line->word_is_empty = word_is_empty;
     line->errno = error;
     line->mode = mode;
     str_append(&line->current_word, 'a');
@@ -27,8 +28,8 @@ static void test_init()
 
     line_init(&line);
     assert_line(line, 0, 0, 0, noerror, mode_split);
-    assert_wordlist_is_empty(line);
     assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
 
     line_del(&line);
 }
@@ -42,9 +43,9 @@ static void test_del()
     
     line_del(&line);
     assert_line(line, 0, 0, 0, noerror, mode_split);
-    assert_wordlist_is_empty(line);
     assert(line.current_word.size == 0);
     assert(line.current_word.data == NULL);
+    assert_wordlist_is_empty(line);
 }
 
 
@@ -56,8 +57,8 @@ static void test_clear()
     
     line_clear(&line);
     assert_line(line, 0, 0, 0, noerror, mode_split);
-    assert_wordlist_is_empty(line);
     assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
 
     line_del(&line);
 }
