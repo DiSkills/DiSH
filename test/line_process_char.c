@@ -57,12 +57,32 @@ static void test_unset_is_empty()
 {
     struct line_t line;
     line_init(&line);
+
+    /* char */
     line.is_empty = 1;
 
     line_process_char(&line, 'a');
     assert_line(line, 0, 0, 0, noerror, mode_split);
     assert(line.current_word.len == 1);
     assert(strcmp(line.current_word.data, "a") == 0);
+    assert_wordlist_is_empty(line);
+
+    /* \ */
+    line_clear(&line);
+    line.is_empty = 1;
+
+    line_process_char(&line, '\\');
+    assert_line(line, 0, 1, 0, noerror, mode_split);
+    assert_word_is_default(line);
+    assert_wordlist_is_empty(line);
+
+    /* " */
+    line_clear(&line);
+    line.is_empty = 1;
+
+    line_process_char(&line, '"');
+    assert_line(line, 0, 0, 0, noerror, mode_nosplit);
+    assert_word_is_default(line);
     assert_wordlist_is_empty(line);
 
     line_del(&line);

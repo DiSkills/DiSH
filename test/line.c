@@ -129,6 +129,51 @@ static void test_process_escape_sequence_correctly()
 }
 
 
+static void test_process_empty_word_correctly()
+{
+    int i;
+    /* abra"" "" ""\\ schw""abra """"  ""kadabra "" */
+    const char s[] =
+        "abra\"\" \"\" \"\"\\\\ schw\"\"abra \"\"\"\"\t\"\"kadabra \"\"\n";
+    struct wordlist_item *item;
+    struct line_t line;
+    line_init(&line);
+
+    for (i = 0; s[i]; i++) {
+        line_process_char(&line, s[i]);
+    }
+    assert_line(line, 1, 0, 0, noerror, mode_split);
+    assert(line.current_word.len == 0);
+    assert(line.current_word.size == 16);
+    assert(strlen(line.current_word.data) == 0);
+
+    item = line.wordlist.first;
+    assert(strcmp(item->word, "abra") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "\\") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "schwabra") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "kadabra") == 0);
+
+    item = item->next;
+    assert(strcmp(item->word, "") == 0);
+    assert(item->next == NULL);
+
+    line_del(&line);
+
+}
+
+
 static void test_process_error_unmatched_quotes()
 {
     int i;
@@ -218,6 +263,7 @@ int main()
 
         test_process_correctly,
         test_process_escape_sequence_correctly,
+        test_process_empty_word_correctly,
 
         test_process_error_unmatched_quotes,
         test_process_error_unsupported_escape_sequence,
