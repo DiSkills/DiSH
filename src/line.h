@@ -17,7 +17,8 @@ enum line_errors {
 
 struct line_t {
     int is_finished,
-        is_escaped;
+        is_escaped,
+        word_is_empty;
 
     enum line_errors errno;
     enum line_split_modes mode;
