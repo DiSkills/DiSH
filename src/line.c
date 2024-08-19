@@ -15,9 +15,11 @@ static void line_toggle_split_mode(struct line_t *line)
     switch (line->mode) {
         case mode_split:
             line->mode = mode_nosplit;
+            line->word_is_empty = 0;
             return;
         case mode_nosplit:
             line->mode = mode_split;
+            line->word_is_empty = !line->current_word.len;
             return;
     }
 }
@@ -75,19 +77,16 @@ void line_process_char(struct line_t *line, char c)
         return;
     }
 
-    if (c == '\\') {
-        line->is_escaped = 1;
-        return;
-    }
-
     if (c == '"') {
         line_toggle_split_mode(line);
         return;
     }
 
-    if (line->mode == mode_nosplit || !is_space(c)) {
+    if (c == '\\') {
+        line->is_escaped = 1;
+    } else if (line->mode == mode_nosplit || !is_space(c)) {
         line_add_char(line, c);
-    } else if (line->current_word.len) {
+    } else if (line->current_word.len || line->word_is_empty) {
         line_add_word(line);
         line_clear_word(line);
     }
@@ -95,6 +94,7 @@ void line_process_char(struct line_t *line, char c)
     if (line->is_finished && line->mode == mode_nosplit) {
         line_set_error(line, error_quotes);
     }
+    line->word_is_empty = 0;
 }
 
 
@@ -102,6 +102,7 @@ static void line_fill_by_default(struct line_t *line)
 {
     line->is_finished = 0;
     line->is_escaped = 0;
+    line->word_is_empty = 0;
 
     line->errno = noerror;
     line->mode = mode_split;
