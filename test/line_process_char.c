@@ -53,13 +53,13 @@ static void test_set_is_escaped()
 }
 
 
-static void test_unset_is_empty()
+static void test_unset_word_is_empty()
 {
     struct line_t line;
     line_init(&line);
 
     /* char */
-    line.is_empty = 1;
+    line.word_is_empty = 1;
 
     line_process_char(&line, 'a');
     assert_line(line, 0, 0, 0, noerror, mode_split);
@@ -69,7 +69,7 @@ static void test_unset_is_empty()
 
     /* \ */
     line_clear(&line);
-    line.is_empty = 1;
+    line.word_is_empty = 1;
 
     line_process_char(&line, '\\');
     assert_line(line, 0, 1, 0, noerror, mode_split);
@@ -78,7 +78,7 @@ static void test_unset_is_empty()
 
     /* " */
     line_clear(&line);
-    line.is_empty = 1;
+    line.word_is_empty = 1;
 
     line_process_char(&line, '"');
     assert_line(line, 0, 0, 0, noerror, mode_nosplit);
@@ -372,7 +372,7 @@ int main()
     test_func tests[] = {
         test_toggle_split_mode,
         test_set_is_escaped,
-        test_unset_is_empty,
+        test_unset_word_is_empty,
         test_mark_end_of_line,
 
         test_ignore_spaces,

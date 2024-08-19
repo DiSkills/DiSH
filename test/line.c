@@ -10,7 +10,7 @@ typedef void (*test_func)();
 
 
 static void fill_line(struct line_t *line, int is_finished, int is_escaped,
-        int is_empty, enum line_errors error, enum line_split_modes mode)
+        int word_is_empty, enum line_errors error, enum line_split_modes mode)
 {
     line->is_finished = is_finished;
     line->is_escaped = is_escaped;
@@ -143,9 +143,7 @@ static void test_process_empty_word_correctly()
         line_process_char(&line, s[i]);
     }
     assert_line(line, 1, 0, 0, noerror, mode_split);
-    assert(line.current_word.len == 0);
-    assert(line.current_word.size == 16);
-    assert(strlen(line.current_word.data) == 0);
+    assert_word_is_default(line);
 
     item = line.wordlist.first;
     assert(strcmp(item->word, "abra") == 0);
