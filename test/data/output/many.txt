@@ -13,6 +13,9 @@
 [foo  bar]
 > Error: unmatched quotes
 > [abraschwabrakadabra]
+> [abra]
+[]
+[foo]
 > Error: unsupported escape sequence
 > [abra]
 > 
