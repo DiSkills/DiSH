@@ -10,7 +10,7 @@ typedef void (*test_func)();
 
 
 static void fill_line(struct line_t *line, int is_finished, int is_escaped,
-        enum line_errors error, enum line_split_modes mode)
+        int is_empty, enum line_errors error, enum line_split_modes mode)
 {
     line->is_finished = is_finished;
     line->is_escaped = is_escaped;
@@ -26,7 +26,7 @@ static void test_init()
     struct line_t line;
 
     line_init(&line);
-    assert_line(line, 0, 0, noerror, mode_split);
+    assert_line(line, 0, 0, 0, noerror, mode_split);
     assert_wordlist_is_empty(line);
     assert_word_is_default(line);
 
@@ -38,10 +38,10 @@ static void test_del()
 {
     struct line_t line;
     line_init(&line);
-    fill_line(&line, 1, 1, error_quotes, mode_nosplit);
+    fill_line(&line, 1, 1, 1, error_quotes, mode_nosplit);
     
     line_del(&line);
-    assert_line(line, 0, 0, noerror, mode_split);
+    assert_line(line, 0, 0, 0, noerror, mode_split);
     assert_wordlist_is_empty(line);
     assert(line.current_word.size == 0);
     assert(line.current_word.data == NULL);
@@ -52,10 +52,10 @@ static void test_clear()
 {
     struct line_t line;
     line_init(&line);
-    fill_line(&line, 1, 1, error_quotes, mode_nosplit);
+    fill_line(&line, 1, 1, 1, error_quotes, mode_nosplit);
     
     line_clear(&line);
-    assert_line(line, 0, 0, noerror, mode_split);
+    assert_line(line, 0, 0, 0, noerror, mode_split);
     assert_wordlist_is_empty(line);
     assert_word_is_default(line);
 
@@ -75,7 +75,7 @@ static void test_process_correctly()
     for (i = 0; s[i]; i++) {
         line_process_char(&line, s[i]);
     }
-    assert_line(line, 1, 0, noerror, mode_split);
+    assert_line(line, 1, 0, 0, noerror, mode_split);
     assert(line.current_word.len == 0);
     assert(line.current_word.size == 32);
     assert(strlen(line.current_word.data) == 0);
@@ -107,7 +107,7 @@ static void test_process_escape_sequence_correctly()
     for (i = 0; s[i]; i++) {
         line_process_char(&line, s[i]);
     }
-    assert_line(line, 1, 0, noerror, mode_split);
+    assert_line(line, 1, 0, 0, noerror, mode_split);
     assert(line.current_word.len == 0);
     assert(line.current_word.size == 32);
     assert(strlen(line.current_word.data) == 0);
@@ -141,7 +141,7 @@ static void test_process_error_unmatched_quotes()
     for (i = 0; s[i]; i++) {
         line_process_char(&line, s[i]);
     }
-    assert_line(line, 1, 0, error_quotes, mode_nosplit);
+    assert_line(line, 1, 0, 0, error_quotes, mode_nosplit);
     assert(line.current_word.len == 4);
     assert(line.current_word.size == 32);
     assert(strcmp(line.current_word.data, "foo\n") == 0);
@@ -169,7 +169,7 @@ static void test_process_error_unsupported_escape_sequence()
     for (i = 0; s[i]; i++) {
         line_process_char(&line, s[i]);
     }
-    assert_line(line, 1, 1, error_escape, mode_split);
+    assert_line(line, 1, 1, 0, error_escape, mode_split);
     assert(line.current_word.len == 11);
     assert(line.current_word.size == 16);
     assert(strcmp(line.current_word.data, "unsupported") == 0);
@@ -197,7 +197,7 @@ static void test_process_check_to_save_first_error()
     for (i = 0; s[i]; i++) {
         line_process_char(&line, s[i]);
     }
-    assert_line(line, 1, 1, error_escape, mode_nosplit);
+    assert_line(line, 1, 1, 0, error_escape, mode_nosplit);
     assert(line.current_word.len == 7);
     assert(line.current_word.size == 16);
     assert(strcmp(line.current_word.data, "to save") == 0);
