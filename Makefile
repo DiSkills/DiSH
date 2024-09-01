@@ -1,34 +1,43 @@
-TARGET = dish
-
-SRCDIR = src
-SRCMODULES = str.c wordlist.c line.c message.c
-SRCS = $(addprefix $(SRCDIR)/,$(SRCMODULES))
-
-OBJDIR = obj
-OBJS = $(addprefix $(OBJDIR)/,$(SRCMODULES:.c=.o))
-
 CC = gcc
 CFLAGS = -ggdb -Wall -ansi -pedantic
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
-	$(CC) $(CFLAGS) -c $< -o $@
+BIN_DIR = bin
+TARGET = $(BIN_DIR)/dish
 
-$(TARGET): $(SRCDIR)/main.c $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+SRC_DIR = src
+SRC_MODULES = str.c wordlist.c line.c message.c
+SRCS = $(SRC_MODULES:%=$(SRC_DIR)/%)
 
-ifneq (clean, $(MAKECMDGOALS))
--include deps.mk
-endif
+PROD_BUILD_DIR = build/prod
+PROD_OBJS = $(SRC_MODULES:%.c=$(PROD_BUILD_DIR)/%.o)
 
-deps.mk: $(SRCS)
-	$(CC) -MM $^ | sed 's|\(.*\.o:\)|$(OBJDIR)/\1|' > $@
+all: $(TARGET)
 
-$(OBJS): | $(OBJDIR)
-
-$(OBJDIR):
+# dependent directories for production
+$(PROD_BUILD_DIR):
 	mkdir -p $@
 
-clean:
-	rm -rf $(OBJDIR) $(TARGET) deps.mk $(TESTBUILDDIR)
+$(PROD_OBJS): | $(PROD_BUILD_DIR)
 
-include Makefile.test
+$(BIN_DIR):
+	mkdir -p $@
+
+$(TARGET): | $(BIN_DIR)
+
+# production build
+$(PROD_BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TARGET): $(SRC_DIR)/main.c $(PROD_OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
+
+# dependencies for objects
+$(PROD_BUILD_DIR)/deps.mk: $(SRCS) | $(PROD_BUILD_DIR)
+	$(CC) -MM $^ | sed 's|\(.*\.o:\)|$(PROD_BUILD_DIR)/\1|' > $@
+
+ifneq (clean, $(MAKECMDGOALS))
+-include $(PROD_BUILD_DIR)/deps.mk
+endif
+
+clean:
+	rm -rf $(PROD_BUILD_DIR) $(BIN_DIR)
