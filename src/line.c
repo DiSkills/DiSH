@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "line.h"
+#include "message.h"
 
 
 static void line_fill_by_default(struct line_t *line)
@@ -35,6 +36,19 @@ void line_clear(struct line_t *line)
     str_clear(&line->current_word);
     wordlist_del(&line->wordlist);
     line_fill_by_default(line);
+}
+
+
+const char *line_get_error_msg(const struct line_t *line)
+{
+    switch (line->errno) {
+        case error_quotes:
+            return msg_line_error_quotes;
+        case error_escape:
+            return msg_line_error_escape;
+        default:
+            return NULL;
+    }
 }
 
 

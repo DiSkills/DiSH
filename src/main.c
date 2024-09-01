@@ -1,38 +1,21 @@
 #include <stdio.h>
 
 #include "line.h"
+#include "message.h"
 
 
-static const char msg_welcome[] = ">";
-
-static const char msg_error[] = "Error:";
-static const char msg_error_quotes[] = "unmatched quotes";
-static const char msg_error_escape[] = "unsupported escape sequence";
-
-
-static void line_print(struct line_t *line)
+static void line_print(const struct line_t *line)
 {
-    struct wordlist_item *p;
+    const struct wordlist_item *p;
     for (p = line->wordlist.first; p; p = p->next) {
         printf("[%s]\n", p->word);
     }
 }
 
 
-static void line_print_error(struct line_t *line)
+static void line_print_error(const struct line_t *line)
 {
-    const char *error;
-    switch (line->errno) {
-        case error_quotes:
-            error = msg_error_quotes;
-            break;
-        case error_escape:
-            error = msg_error_escape;
-            break;
-        case noerror:
-            return;
-    }
-    fprintf(stderr, "%s %s\n", msg_error, error);
+    fprintf(stderr, "%s: %s\n", msg_error, line_get_error_msg(line));
 }
 
 
