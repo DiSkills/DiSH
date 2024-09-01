@@ -1,19 +1,7 @@
-CC = gcc
-CFLAGS = -ggdb -Wall -ansi -pedantic
-
-BUILD_DIR = build
-
-BIN_DIR = bin
 TARGET = $(BIN_DIR)/dish
-
-SRC_DIR = src
-SRC_MODULES = str.c wordlist.c line.c message.c
-SRCS = $(SRC_MODULES:%=$(SRC_DIR)/%)
 
 PROD_BUILD_DIR = $(BUILD_DIR)/prod
 PROD_OBJS = $(SRC_MODULES:%.c=$(PROD_BUILD_DIR)/%.o)
-
-all: $(TARGET)
 
 # dependent directories for production
 $(PROD_BUILD_DIR):
@@ -40,8 +28,3 @@ $(PROD_BUILD_DIR)/deps.mk: $(SRCS) | $(PROD_BUILD_DIR)
 ifneq (clean, $(MAKECMDGOALS))
 -include $(PROD_BUILD_DIR)/deps.mk
 endif
-
-clean:
-	rm -rf $(PROD_BUILD_DIR) $(BIN_DIR)
-
-include Makefile.test
