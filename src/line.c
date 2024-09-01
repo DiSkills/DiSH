@@ -4,6 +4,40 @@
 #include "line.h"
 
 
+static void line_fill_by_default(struct line_t *line)
+{
+    line->is_finished = 0;
+    line->is_escaped = 0;
+    line->word_is_empty = 0;
+
+    line->errno = noerror;
+    line->mode = mode_split;
+}
+
+
+void line_init(struct line_t *line)
+{
+    line_fill_by_default(line);
+    str_init(&line->current_word);
+    wordlist_init(&line->wordlist);
+}
+
+
+void line_del(struct line_t *line)
+{
+    line_clear(line);
+    str_del(&line->current_word);
+}
+
+
+void line_clear(struct line_t *line)
+{
+    str_clear(&line->current_word);
+    wordlist_del(&line->wordlist);
+    line_fill_by_default(line);
+}
+
+
 static int is_space(char c)
 {
     return c == ' ' || c == '\t' || c == '\n';
@@ -19,7 +53,7 @@ static void line_toggle_split_mode(struct line_t *line)
             return;
         case mode_nosplit:
             line->mode = mode_split;
-            line->word_is_empty = !line->current_word.len;
+            line->word_is_empty = (line->current_word.len == 0);
             return;
     }
 }
@@ -95,38 +129,4 @@ void line_process_char(struct line_t *line, char c)
         line_set_error(line, error_quotes);
     }
     line->word_is_empty = 0;
-}
-
-
-static void line_fill_by_default(struct line_t *line)
-{
-    line->is_finished = 0;
-    line->is_escaped = 0;
-    line->word_is_empty = 0;
-
-    line->errno = noerror;
-    line->mode = mode_split;
-}
-
-
-void line_init(struct line_t *line)
-{
-    line_fill_by_default(line);
-    str_init(&line->current_word);
-    wordlist_init(&line->wordlist);
-}
-
-
-void line_del(struct line_t *line)
-{
-    line_clear(line);
-    str_del(&line->current_word);
-}
-
-
-void line_clear(struct line_t *line)
-{
-    str_clear(&line->current_word);
-    wordlist_del(&line->wordlist);
-    line_fill_by_default(line);
 }
