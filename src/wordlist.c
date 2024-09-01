@@ -11,9 +11,28 @@ void wordlist_init(struct wordlist_t *wordlist)
 }
 
 
+void wordlist_del(struct wordlist_t *wordlist)
+{
+    while (wordlist->first) {
+        struct wordlist_item *tmp;
+
+        tmp = wordlist->first;
+        wordlist->first = tmp->next;
+
+        if (tmp->word) {
+            free(tmp->word);
+        }
+        free(tmp);
+    }
+    wordlist->last = NULL;
+}
+
+
 void wordlist_push_back(struct wordlist_t *wordlist, const char *word)
 {
-    struct wordlist_item *tmp = malloc(sizeof(struct wordlist_item));
+    struct wordlist_item *tmp;
+
+    tmp = malloc(sizeof(*tmp));
     tmp->word = malloc(strlen(word) + 1);
     strcpy(tmp->word, word);
     tmp->next = NULL;
@@ -24,16 +43,4 @@ void wordlist_push_back(struct wordlist_t *wordlist, const char *word)
         wordlist->first = tmp;
     }
     wordlist->last = tmp;
-}
-
-
-void wordlist_del(struct wordlist_t *wordlist)
-{
-    while (wordlist->first) {
-        struct wordlist_item *tmp = wordlist->first;
-        wordlist->first = tmp->next;
-        free(tmp->word);
-        free(tmp);
-    }
-    wordlist->last = NULL;
 }

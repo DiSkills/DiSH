@@ -30,6 +30,7 @@ struct line_t {
 void line_init(struct line_t *line);
 void line_del(struct line_t *line);
 void line_clear(struct line_t *line);
+const char *line_get_error_msg(const struct line_t *line);
 void line_process_char(struct line_t *line, char c);
 
 #endif
