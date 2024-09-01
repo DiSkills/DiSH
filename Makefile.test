@@ -1,18 +1,49 @@
-TESTDIR = test
-TESTBUILDDIR = $(TESTDIR)/build
-TESTMODULES = str.c wordlist.c line.c line_process_char.c
-TESTS = $(addprefix $(TESTBUILDDIR)/,$(TESTMODULES:%.c=%))
+TEST_CFLAGS = 
 
-$(TESTBUILDDIR)/%: $(TESTDIR)/%.c $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+TEST_BIN_DIR = $(BIN_DIR)/test
+TEST_TARGET = $(TEST_BIN_DIR)/dish
 
-$(TESTS): | $(TESTBUILDDIR)
+TEST_DIR = test
+TEST_MODULES = str.c wordlist.c line.c line_process_char.c
+TESTS = $(TEST_MODULES:%.c=$(TEST_BIN_DIR)/%)
 
-$(TESTBUILDDIR):
+TEST_BUILD_DIR = $(BUILD_DIR)/test
+TEST_OBJS = $(SRC_MODULES:%.c=$(TEST_BUILD_DIR)/%.o)
+
+# dependent directories for tests
+$(TEST_BUILD_DIR):
 	mkdir -p $@
+
+$(TEST_OBJS): | $(TEST_BUILD_DIR)
+
+$(TEST_BIN_DIR):
+	mkdir -p $@
+
+$(TEST_TARGET): | $(TEST_BIN_DIR)
+
+# test build
+$(TEST_BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h
+	$(CC) $(TEST_CFLAGS) $(CFLAGS) -c $< -o $@
+
+$(TEST_TARGET): $(SRC_DIR)/main.c $(TEST_OBJS)
+	$(CC) $(TEST_CFLAGS) $(CFLAGS) $^ -o $@
+
+# dependencies for objects
+$(TEST_BUILD_DIR)/deps.mk: $(SRCS) | $(TEST_BUILD_DIR)
+	$(CC) -MM $^ | sed 's|\(.*\.o:\)|$(TEST_BUILD_DIR)/\1|' > $@
+
+ifneq (clean, $(MAKECMDGOALS))
+-include $(TEST_BUILD_DIR)/deps.mk
+endif
+
+# tests
+$(TEST_BIN_DIR)/%: $(TEST_DIR)/%.c $(TEST_OBJS)
+	$(CC) $(TEST_CFLAGS) $(CFLAGS) $^ -o $@
+
+$(TESTS): | $(TEST_BIN_DIR)
 
 unittests: $(TESTS)
 	for test in $^; do ./$$test; done
 
-test: unittests $(TARGET)
-	./test_dish.sh $(TARGET) $(TESTDIR)/data
+tests: $(TEST_TARGET) unittests
+	./test_dish.sh $< $(TEST_DIR)/data

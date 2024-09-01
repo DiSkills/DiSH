@@ -1,34 +1,20 @@
-TARGET = dish
-
-SRCDIR = src
-SRCMODULES = str.c wordlist.c line.c message.c
-SRCS = $(addprefix $(SRCDIR)/,$(SRCMODULES))
-
-OBJDIR = obj
-OBJS = $(addprefix $(OBJDIR)/,$(SRCMODULES:.c=.o))
-
 CC = gcc
 CFLAGS = -ggdb -Wall -ansi -pedantic
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
-	$(CC) $(CFLAGS) -c $< -o $@
+BUILD_DIR = build
+BIN_DIR = bin
 
-$(TARGET): $(SRCDIR)/main.c $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+SRC_DIR = src
+SRC_MODULES = str.c wordlist.c line.c message.c
+SRCS = $(SRC_MODULES:%=$(SRC_DIR)/%)
 
-ifneq (clean, $(MAKECMDGOALS))
--include deps.mk
-endif
+include Makefile.prod
+include Makefile.test
 
-deps.mk: $(SRCS)
-	$(CC) -MM $^ | sed 's|\(.*\.o:\)|$(OBJDIR)/\1|' > $@
-
-$(OBJS): | $(OBJDIR)
-
-$(OBJDIR):
-	mkdir -p $@
+all: $(TARGET) $(TEST_TARGET)
 
 clean:
-	rm -rf $(OBJDIR) $(TARGET) deps.mk $(TESTBUILDDIR)
+	rm -rf $(BIN_DIR) $(BUILD_DIR)
 
-include Makefile.test
+.PHONY: all unittests tests clean
+.DEFAULT_GOAL := all
