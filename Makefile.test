@@ -6,20 +6,20 @@ TEST_UNIT_DIR = $(TEST_DIR)/unit
 TEST_UNIT_MODULES = str.c wordlist.c line.c line_process.c line_process_char.c
 TEST_UNITS = $(TEST_UNIT_MODULES:%.c=$(TEST_BIN_DIR)/%)
 
-TEST_FRAMEWORK = unity
-TEST_FRAMEWORK_SRC = $(LIB_DIR)/$(TEST_FRAMEWORK)/src/unity.c
-TEST_FRAMEWORK_INCLUDE = -isystem $(LIB_DIR)/$(TEST_FRAMEWORK)/src
+TEST_FRAMEWORK = $(LIB_DIR)/unity
+TEST_FRAMEWORK_SRC = $(TEST_FRAMEWORK)/src/unity.c
+TEST_FRAMEWORK_INCLUDE = -isystem $(TEST_FRAMEWORK)/src
 
 
 # dependent directories
 $(TEST_BIN_DIR):
 	mkdir -p $@
 
-$(TEST_UNITS): | $(TEST_BIN_DIR)
+$(TEST_UNITS): | $(TEST_BIN_DIR) $(TEST_FRAMEWORK)
 
 
 # unit testing framework
-$(LIB_DIR)/$(TEST_FRAMEWORK): | $(LIB_DIR)
+$(TEST_FRAMEWORK): | $(LIB_DIR)
 	git clone https://github.com/ThrowTheSwitch/Unity.git $@
 
 
