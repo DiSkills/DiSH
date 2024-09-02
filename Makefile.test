@@ -1,49 +1,35 @@
-TEST_CFLAGS = 
-
 TEST_BIN_DIR = $(BIN_DIR)/test
-TEST_TARGET = $(TEST_BIN_DIR)/dish
 
 TEST_DIR = test
-TEST_MODULES = str.c wordlist.c line.c line_process_char.c
-TESTS = $(TEST_MODULES:%.c=$(TEST_BIN_DIR)/%)
 
-TEST_BUILD_DIR = $(BUILD_DIR)/test
-TEST_OBJS = $(SRC_MODULES:%.c=$(TEST_BUILD_DIR)/%.o)
+TEST_UNIT_DIR = $(TEST_DIR)/unit
+TEST_UNIT_MODULES = str.c wordlist.c line.c line_process.c line_process_char.c
+TEST_UNITS = $(TEST_UNIT_MODULES:%.c=$(TEST_BIN_DIR)/%)
 
-# dependent directories for tests
-$(TEST_BUILD_DIR):
-	mkdir -p $@
+TEST_FRAMEWORK = $(LIB_DIR)/unity
+TEST_FRAMEWORK_SRC = $(TEST_FRAMEWORK)/src/unity.c
+TEST_FRAMEWORK_INCLUDE = -isystem $(TEST_FRAMEWORK)/src
 
-$(TEST_OBJS): | $(TEST_BUILD_DIR)
 
+# dependent directories
 $(TEST_BIN_DIR):
 	mkdir -p $@
 
-$(TEST_TARGET): | $(TEST_BIN_DIR)
+$(TEST_UNITS): | $(TEST_BIN_DIR) $(TEST_FRAMEWORK)
 
-# test build
-$(TEST_BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h
-	$(CC) $(TEST_CFLAGS) $(CFLAGS) -c $< -o $@
 
-$(TEST_TARGET): $(SRC_DIR)/main.c $(TEST_OBJS)
-	$(CC) $(TEST_CFLAGS) $(CFLAGS) $^ -o $@
+# unit testing framework
+$(TEST_FRAMEWORK): | $(LIB_DIR)
+	git clone https://github.com/ThrowTheSwitch/Unity.git $@
 
-# dependencies for objects
-$(TEST_BUILD_DIR)/deps.mk: $(SRCS) | $(TEST_BUILD_DIR)
-	$(CC) -MM $^ | sed 's|\(.*\.o:\)|$(TEST_BUILD_DIR)/\1|' > $@
-
-ifneq (clean, $(MAKECMDGOALS))
--include $(TEST_BUILD_DIR)/deps.mk
-endif
 
 # tests
-$(TEST_BIN_DIR)/%: $(TEST_DIR)/%.c $(TEST_OBJS)
-	$(CC) $(TEST_CFLAGS) $(CFLAGS) $^ -o $@
+$(TEST_BIN_DIR)/%: $(TEST_UNIT_DIR)/%.c $(TEST_FRAMEWORK_SRC) $(OBJS)
+	$(CC) $(TEST_FRAMEWORK_INCLUDE) $(CFLAGS) $^ -o $@
 
-$(TESTS): | $(TEST_BIN_DIR)
 
-unittests: $(TESTS)
-	for test in $^; do ./$$test; done
+unittests: $(TEST_UNITS)
+	for test in $^; do echo "\n*****TEST $$test*****"; ./$$test; done
 
-tests: $(TEST_TARGET) unittests
+tests: $(TARGET) unittests
 	./test_dish.sh $< $(TEST_DIR)/data
