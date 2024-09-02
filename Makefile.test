@@ -3,7 +3,7 @@ TEST_BIN_DIR = $(BIN_DIR)/test
 TEST_DIR = test
 
 TEST_UNIT_DIR = $(TEST_DIR)/unit
-TEST_UNIT_MODULES = str.c
+TEST_UNIT_MODULES = str.c wordlist.c
 TEST_UNITS = $(TEST_UNIT_MODULES:%.c=$(TEST_BIN_DIR)/%)
 
 TEST_FRAMEWORK = unity
