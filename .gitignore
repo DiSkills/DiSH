@@ -1,5 +1,4 @@
-test/build
-obj/*
+build/*
+bin/*
 tags
-deps.mk
-dish
+lib/*

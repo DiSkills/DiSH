@@ -4,11 +4,17 @@ TEST_DIR = test
 TEST_MODULES = str.c wordlist.c line.c line_process_char.c
 TESTS = $(TEST_MODULES:%.c=$(TEST_BIN_DIR)/%)
 
+TEST_FRAMEWORK = unity
+
 # dependent directories
 $(TEST_BIN_DIR):
 	mkdir -p $@
 
 $(TESTS): | $(TEST_BIN_DIR)
+
+# unit testing framework
+$(LIB_DIR)/$(TEST_FRAMEWORK): | $(LIB_DIR)
+	git clone https://github.com/ThrowTheSwitch/Unity.git $@
 
 # tests
 $(TEST_BIN_DIR)/%: $(TEST_DIR)/%.c $(OBJS)

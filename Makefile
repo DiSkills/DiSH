@@ -2,6 +2,7 @@ CC = gcc
 CFLAGS = -ggdb -Wall -ansi -pedantic
 
 BIN_DIR = bin
+LIB_DIR = lib
 BUILD_DIR = build
 
 TARGET = $(BIN_DIR)/dish
@@ -22,6 +23,9 @@ $(BIN_DIR):
 	mkdir -p $@
 
 $(TARGET): | $(BIN_DIR)
+
+$(LIB_DIR):
+	mkdir -p $@
 
 
 # dependencies for objects
