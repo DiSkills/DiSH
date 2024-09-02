@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -ggdb -Wall -ansi -pedantic
+CFLAGS = -ggdb -Wall -ansi -pedantic -I./
 
 BIN_DIR = bin
 LIB_DIR = lib

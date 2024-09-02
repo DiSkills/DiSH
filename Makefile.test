@@ -1,26 +1,34 @@
 TEST_BIN_DIR = $(BIN_DIR)/test
 
 TEST_DIR = test
-TEST_MODULES = str.c wordlist.c line.c line_process_char.c
-TESTS = $(TEST_MODULES:%.c=$(TEST_BIN_DIR)/%)
+
+TEST_UNIT_DIR = $(TEST_DIR)/unit
+TEST_UNIT_MODULES = str.c
+TEST_UNITS = $(TEST_UNIT_MODULES:%.c=$(TEST_BIN_DIR)/%)
 
 TEST_FRAMEWORK = unity
+TEST_FRAMEWORK_SRC = $(LIB_DIR)/$(TEST_FRAMEWORK)/src/unity.c
+TEST_FRAMEWORK_INCLUDE = -isystem $(LIB_DIR)/$(TEST_FRAMEWORK)/src
+
 
 # dependent directories
 $(TEST_BIN_DIR):
 	mkdir -p $@
 
-$(TESTS): | $(TEST_BIN_DIR)
+$(TEST_UNITS): | $(TEST_BIN_DIR)
+
 
 # unit testing framework
 $(LIB_DIR)/$(TEST_FRAMEWORK): | $(LIB_DIR)
 	git clone https://github.com/ThrowTheSwitch/Unity.git $@
 
-# tests
-$(TEST_BIN_DIR)/%: $(TEST_DIR)/%.c $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
 
-unittests: $(TESTS)
+# tests
+$(TEST_BIN_DIR)/%: $(TEST_UNIT_DIR)/%.c $(TEST_FRAMEWORK_SRC) $(OBJS)
+	$(CC) $(TEST_FRAMEWORK_INCLUDE) $(CFLAGS) $^ -o $@
+
+
+unittests: $(TEST_UNITS)
 	for test in $^; do ./$$test; done
 
 tests: $(TARGET) unittests
