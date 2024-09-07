@@ -37,7 +37,7 @@ static void fill_cmd(struct cmd_t *cmd, const char *s,
 
 static void test_init()
 {
-    struct cmd_t cmd;
+    struct cmd_t cmd = { "ls", 2, NULL, state_exited, 1589, 1 };
 
     cmd_init(&cmd);
     TEST_ASSERT_NULL(cmd.name);
