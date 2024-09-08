@@ -23,6 +23,18 @@ void cmd_init(struct cmd_t *cmd)
 }
 
 
+void cmd_del(struct cmd_t *cmd)
+{
+    int i;
+    for (i = 0; i < cmd->argc; i++) {
+        free((char*)cmd->argv[i]);
+    }
+    free(cmd->argv);
+
+    cmd_fill_by_default(cmd);
+}
+
+
 static void wordlist_callback_move_word(struct wordlist_item *item,
         void *userdata)
 {
