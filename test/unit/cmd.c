@@ -101,6 +101,31 @@ static void test_line_to_cmd()
 }
 
 
+static void test_empty_line_to_cmd()
+{
+    struct cmd_t cmd;
+    struct line_t line;
+
+    cmd_init(&cmd);
+    line_init(&line);
+    line.is_finished = 1;
+
+    line_to_cmd(&line, &cmd);
+    TEST_ASSERT_NULL(cmd.name);
+    TEST_ASSERT_EQUAL_INT(0, cmd.argc);
+    TEST_ASSERT_EQUAL_INT(state_not_launched, cmd.state);
+
+    TEST_ASSERT_NULL(cmd.argv[0]);
+
+    TEST_ASSERT_LINE(line, 0, 0, 0, noerror, mode_split);
+    TEST_ASSERT_LINE_WORD_IS_DEFAULT(line);
+    TEST_ASSERT_LINE_WORDLIST_IS_EMPTY(line);
+
+    line_del(&line);
+    cmd_del(&cmd);
+}
+
+
 int main()
 {
     UNITY_BEGIN();
@@ -108,6 +133,7 @@ int main()
     RUN_TEST(test_init);
     RUN_TEST(test_del);
     RUN_TEST(test_line_to_cmd);
+    RUN_TEST(test_empty_line_to_cmd);
     
     return UNITY_END();
 }
