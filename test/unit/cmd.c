@@ -82,6 +82,7 @@ static void test_line_to_cmd()
 
     line_to_cmd(&line, &cmd);
     TEST_ASSERT_EQUAL_STRING("ls", cmd.name);
+    TEST_ASSERT_EQUAL_PTR(cmd.name, cmd.argv[0]);
     TEST_ASSERT_EQUAL_INT(4, cmd.argc);
     TEST_ASSERT_EQUAL_INT(state_not_launched, cmd.state);
 
@@ -89,7 +90,10 @@ static void test_line_to_cmd()
     TEST_ASSERT_EQUAL_STRING("-l", cmd.argv[1]);
     TEST_ASSERT_EQUAL_STRING("-a", cmd.argv[2]);
     TEST_ASSERT_EQUAL_STRING("/", cmd.argv[3]);
+    TEST_ASSERT_NULL(cmd.argv[4]);
 
+    TEST_ASSERT_LINE(line, 0, 0, 0, noerror, mode_split);
+    TEST_ASSERT_LINE_WORD_IS_DEFAULT(line);
     TEST_ASSERT_LINE_WORDLIST_IS_EMPTY(line);
 
     line_del(&line);

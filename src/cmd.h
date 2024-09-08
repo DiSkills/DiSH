@@ -14,7 +14,7 @@ struct cmd_t {
     const char *name;
 
     int argc;
-    const char *const *argv;
+    const char **argv;
 
     enum cmd_states state;
 
