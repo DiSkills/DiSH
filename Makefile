@@ -8,7 +8,7 @@ BUILD_DIR = build
 TARGET = $(BIN_DIR)/dish
 
 SRC_DIR = src
-SRC_MODULES = str.c wordlist.c line.c message.c
+SRC_MODULES = str.c wordlist.c line.c message.c cmd.c
 SRCS = $(SRC_MODULES:%=$(SRC_DIR)/%)
 OBJS = $(SRC_MODULES:%.c=$(BUILD_DIR)/%.o)
 
