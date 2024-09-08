@@ -29,7 +29,11 @@ $(TEST_BIN_DIR)/%: $(TEST_UNIT_DIR)/%.c $(TEST_FRAMEWORK_SRC) $(OBJS)
 
 
 unittests: $(TEST_UNITS)
-	for test in $^; do echo "\n*****TEST $$test*****"; ./$$test; done
+	for test in $^; do \
+		echo "\n*****TEST $$test*****"; \
+		set -e; \
+		./$$test; \
+	done
 
 tests: $(TARGET) unittests
 	./test_dish.sh $< $(TEST_DIR)/data
