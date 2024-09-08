@@ -13,6 +13,9 @@ struct wordlist_t {
 
 void wordlist_init(struct wordlist_t *wordlist);
 void wordlist_del(struct wordlist_t *wordlist);
+
 void wordlist_push_back(struct wordlist_t *wordlist, const char *word);
+
+int wordlist_len(const struct wordlist_t *wordlist);
 
 #endif

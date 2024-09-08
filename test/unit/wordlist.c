@@ -25,10 +25,27 @@ static void test_init()
 }
 
 
+static void test_del()
+{
+    struct wordlist_t wordlist;
+    const char first[] = "The first",
+          second[] = "The second";
+
+    wordlist_init(&wordlist);
+    wordlist_push_back(&wordlist, first);
+    wordlist_push_back(&wordlist, second);
+
+    wordlist_del(&wordlist);
+    TEST_ASSERT_NULL(wordlist.first);
+    TEST_ASSERT_NULL(wordlist.last);
+}
+
+
 static void test_push_back_first_item()
 {
     struct wordlist_t wordlist;
     const char word[] = "word";
+
     wordlist_init(&wordlist);
 
     wordlist_push_back(&wordlist, word);
@@ -49,6 +66,7 @@ static void test_push_back_two_items()
     struct wordlist_t wordlist;
     const char first[] = "The first",
           second[] = "The second";
+
     wordlist_init(&wordlist);
     wordlist_push_back(&wordlist, first);
 
@@ -63,18 +81,26 @@ static void test_push_back_two_items()
 }
 
 
-static void test_del()
+static void test_len()
 {
+    int len;
     struct wordlist_t wordlist;
     const char first[] = "The first",
           second[] = "The second";
+
     wordlist_init(&wordlist);
+    len = wordlist_len(&wordlist);
+    TEST_ASSERT_EQUAL_INT(0, len);
+
     wordlist_push_back(&wordlist, first);
+    len = wordlist_len(&wordlist);
+    TEST_ASSERT_EQUAL_INT(1, len);
+
     wordlist_push_back(&wordlist, second);
+    len = wordlist_len(&wordlist);
+    TEST_ASSERT_EQUAL_INT(2, len);
 
     wordlist_del(&wordlist);
-    TEST_ASSERT_NULL(wordlist.first);
-    TEST_ASSERT_NULL(wordlist.last);
 }
 
 
@@ -83,9 +109,12 @@ int main()
     UNITY_BEGIN();
 
     RUN_TEST(test_init);
+    RUN_TEST(test_del);
+
     RUN_TEST(test_push_back_first_item);
     RUN_TEST(test_push_back_two_items);
-    RUN_TEST(test_del);
+
+    RUN_TEST(test_len);
 
     return UNITY_END();
 }
