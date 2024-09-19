@@ -57,14 +57,18 @@ void wordlist_traverse(struct wordlist_t *wordlist,
 }
 
 
+static void callback_length(struct wordlist_item *p, void *userdata)
+{
+    int *length = userdata;
+    (*length)++;
+}
+
+
 int wordlist_length(const struct wordlist_t *wordlist)
 {
     int length = 0;
-    const struct wordlist_item *p;
 
-    for (p = wordlist->first; p; p = p->next) {
-        length++;
-    }
-
+    wordlist_traverse((struct wordlist_t *)wordlist,
+            callback_length, &length);
     return length;
 }
