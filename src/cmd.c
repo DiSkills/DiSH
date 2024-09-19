@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "cmd.h"
@@ -94,5 +95,25 @@ void cmd_exec(struct cmd_t *cmd)
         cd(cmd);
     } else {
         exec(cmd);
+    }
+}
+
+
+void cmd_wait(struct cmd_t *cmd)
+{
+    int wr;
+
+    wr = waitpid(cmd->pid, &cmd->code, 0);
+    if (wr == -1) {
+        perror("wait");
+        return;
+    }
+
+    if (WIFEXITED(cmd->code)) {
+        cmd->code = WEXITSTATUS(cmd->code);
+        cmd->state = state_exited;
+    } else {
+        cmd->code = WTERMSIG(cmd->code);
+        cmd->state = state_terminated;
     }
 }
