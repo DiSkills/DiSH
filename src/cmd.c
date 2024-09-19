@@ -1,4 +1,6 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "cmd.h"
 
@@ -43,4 +45,26 @@ void cmd_del(struct cmd_t *cmd)
     cmd->argv = NULL;
     cmd->name = NULL;
     cmd->state = state_not_launched;
+}
+
+
+static void cd(struct cmd_t *cmd)
+{
+    int cdr;
+
+    cmd->pid = 0;
+    cmd->code = 1;
+    cmd->state = state_exited;
+
+    if (cmd->argc != 2) {
+        fprintf(stderr, "cd: too many arguments\n");
+        return;
+    }
+
+    cdr = chdir(cmd->argv[1]);
+    if (cdr == -1) {
+        perror(cmd->argv[1]);
+        return;
+    }
+    cmd->code = 0;
 }
