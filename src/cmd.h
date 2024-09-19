@@ -24,5 +24,6 @@ struct cmd_t {
 
 void cmd_init_from_line(struct cmd_t *cmd, struct line_t *line);
 void cmd_del(struct cmd_t *cmd);
+void cmd_exec(struct cmd_t *cmd);
 
 #endif

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "cmd.h"
@@ -84,4 +85,14 @@ static void exec(struct cmd_t *cmd)
         exit(1);
     }
     cmd->state = state_launched;
+}
+
+
+void cmd_exec(struct cmd_t *cmd)
+{
+    if (strcmp(cmd->name, "cd") == 0) {
+        cd(cmd);
+    } else {
+        exec(cmd);
+    }
 }
