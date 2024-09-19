@@ -31,3 +31,16 @@ void cmd_init_from_line(struct cmd_t *cmd, struct line_t *line)
 
     line_clear(line);
 }
+
+
+void cmd_del(struct cmd_t *cmd)
+{
+    for (; cmd->argc; cmd->argc--) {
+        free(cmd->argv[cmd->argc - 1]);
+    }
+    free(cmd->argv);
+
+    cmd->argv = NULL;
+    cmd->name = NULL;
+    cmd->state = state_not_launched;
+}
