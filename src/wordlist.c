@@ -44,3 +44,16 @@ void wordlist_push_back(struct wordlist_t *wordlist, const char *word)
     }
     wordlist->last = tmp;
 }
+
+
+int wordlist_length(const struct wordlist_t *wordlist)
+{
+    int length = 0;
+    const struct wordlist_item *p;
+
+    for (p = wordlist->first; p; p = p->next) {
+        length++;
+    }
+
+    return length;
+}
