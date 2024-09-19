@@ -68,3 +68,20 @@ static void cd(struct cmd_t *cmd)
     }
     cmd->code = 0;
 }
+
+
+static void exec(struct cmd_t *cmd)
+{
+    cmd->pid = fork();
+    if (cmd->pid == -1) {
+        perror("fork");
+        return;
+    }
+
+    if (cmd->pid == 0) {
+        execvp(cmd->name, cmd->argv);
+        perror(cmd->name);
+        exit(1);
+    }
+    cmd->state = state_launched;
+}
