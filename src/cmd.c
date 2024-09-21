@@ -91,6 +91,10 @@ static void exec(struct cmd_t *cmd)
 
 void cmd_exec(struct cmd_t *cmd)
 {
+    if (!cmd->name) {
+        return;
+    }
+
     if (strcmp(cmd->name, "cd") == 0) {
         cd(cmd);
     } else {
