@@ -51,5 +51,8 @@ all: $(TARGET)
 clean:
 	rm -rf $(BIN_DIR) $(BUILD_DIR)
 
-.PHONY: all unittests clean unity
+submodules:
+	git submodule update --init --recursive
+
+.PHONY: all unittests clean unity submodules
 .DEFAULT_GOAL := all
