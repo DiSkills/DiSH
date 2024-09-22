@@ -22,3 +22,6 @@ jobs:
 
       - name: Make unittests
         run: make unittests
+
+      - name: Make functests
+        run: make functests
