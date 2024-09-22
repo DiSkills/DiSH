@@ -103,3 +103,12 @@ EOF
     assert_success
     assert_output "$w badname: No such file or directory""$newline""$w "
 }
+
+
+@test "execute program: works correctly" {
+    run dish <<EOF
+ls -lh -a
+EOF
+    assert_success
+    assert_output "$w ""`ls -lh -a`""$newline""$w "
+}
