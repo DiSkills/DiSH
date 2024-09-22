@@ -17,7 +17,7 @@ setup() {
 }
 
 
-@test "Enter an empty line" {
+@test "ignore empty line" {
     run dish <<EOF
 
 EOF
@@ -26,7 +26,7 @@ EOF
 }
 
 
-@test "Exit by Ctrl-D" {
+@test "exit by Ctrl-D" {
     run dish <<EOF
 EOF
     assert_success
@@ -34,7 +34,7 @@ EOF
 }
 
 
-@test "Print an error message for unmatched quotes" {
+@test "string processing: unmatched quotes error" {
     run dish <<EOF
 $PRINT_ARGS "Hello, ""World!
 EOF
@@ -43,7 +43,7 @@ EOF
 }
 
 
-@test "Print an error message for an unsupported escape sequence" {
+@test "string processing: escape sequence error" {
     run dish <<EOF
 $PRINT_ARGS Hello \\World!
 EOF
@@ -52,7 +52,7 @@ EOF
 }
 
 
-@test "Check string processing" {
+@test "string processing: works correctly" {
     run dish <<EOF
 $PRINT_ARGS "Hello, World!" "" My name"" ""is \\"DiSkills\\" \\\\
 EOF
@@ -68,17 +68,16 @@ $w "
 }
 
 
-@test "Check cd" {
+@test "cd: invalid number of arguments" {
     run dish <<EOF
-cd test
-pwd
+cd dir1 dir2
 EOF
     assert_success
-    assert_output "$w $w "`cd test && pwd`"$newline""$w "
+    assert_output "$w cd: too many arguments""$newline""$w "
 }
 
 
-@test "Check error handling for cd" {
+@test "cd: error from chdir" {
     run dish <<EOF
 cd baddir
 EOF
@@ -87,10 +86,11 @@ EOF
 }
 
 
-@test "Check error for cd by number of arguments" {
+@test "cd: works correctly" {
     run dish <<EOF
-cd dir1 dir2
+cd test
+pwd
 EOF
     assert_success
-    assert_output "$w cd: too many arguments""$newline""$w "
+    assert_output "$w $w "`cd test && pwd`"$newline""$w "
 }
