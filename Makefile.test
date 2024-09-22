@@ -8,10 +8,7 @@ TESTS = $(TEST_UNITS:$(TEST_UNIT_DIR)/%.c=$(TEST_BIN_DIR)/%)
 
 
 install_unity:
-	cd lib/unity/
-	mkdir -p build && cd build && cmake ..
-	cmake --build .
-	make install/local
+	cd lib/unity/ && mkdir -p build && cd build && pwd && cmake .. && cmake --build . && make install/local
 
 
 # dependent directories
