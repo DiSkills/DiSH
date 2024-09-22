@@ -50,3 +50,19 @@ EOF
     assert_success
     assert_output "$w $msg_line_error_escape""$newline""$w "
 }
+
+
+@test "Check string processing" {
+    run dish <<EOF
+$PRINT_ARGS "Hello, World!" "" My name"" ""is \\"DiSkills\\" \\\\
+EOF
+    assert_success
+    assert_output "$w [Hello, World!]
+[]
+[My]
+[name]
+[is]
+[\"DiSkills\"]
+[\\]
+$w "
+}
