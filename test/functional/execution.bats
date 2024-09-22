@@ -94,3 +94,12 @@ EOF
     assert_success
     assert_output "$w $w "`cd test && pwd`"$newline""$w "
 }
+
+
+@test "execute program: invalid program name" {
+    run dish <<EOF
+badname
+EOF
+    assert_success
+    assert_output "$w badname: No such file or directory""$newline""$w "
+}
