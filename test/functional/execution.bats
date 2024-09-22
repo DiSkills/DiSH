@@ -76,3 +76,12 @@ EOF
     assert_success
     assert_output "$w $w "`cd test && pwd`"$newline""$w "
 }
+
+
+@test "Check error handling for cd" {
+    run dish <<EOF
+cd baddir
+EOF
+    assert_success
+    assert_output "$w baddir: No such file or directory""$newline""$w "
+}
