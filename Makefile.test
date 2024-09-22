@@ -14,6 +14,12 @@ $(TEST_BIN_DIR):
 $(TESTS): | $(TEST_BIN_DIR)
 
 
+# Unity
+unity:
+	cmake -S lib/unity -B lib/unity/build
+	sudo cmake --build lib/unity/build --target install/local
+
+
 # tests
 $(TEST_BIN_DIR)/%: $(TEST_UNIT_DIR)/%.c $(OBJS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -lunity -o $@
