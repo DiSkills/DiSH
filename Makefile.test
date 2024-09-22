@@ -3,38 +3,31 @@ TEST_BIN_DIR = $(BIN_DIR)/test
 TEST_DIR = test
 
 TEST_UNIT_DIR = $(TEST_DIR)/unit
-TEST_UNIT_MODULES = str.c wordlist.c cmd.c \
-					line.c line_process.c line_process_char.c
-TEST_UNITS = $(TEST_UNIT_MODULES:%.c=$(TEST_BIN_DIR)/%)
-
-TEST_FRAMEWORK = $(LIB_DIR)/unity
-TEST_FRAMEWORK_SRC = $(TEST_FRAMEWORK)/src/unity.c
-TEST_FRAMEWORK_INCLUDE = -isystem $(TEST_FRAMEWORK)/src
+TEST_UNITS = $(wildcard $(TEST_UNIT_DIR)/*.c)
+TESTS = $(TEST_UNITS:$(TEST_UNIT_DIR)/%.c=$(TEST_BIN_DIR)/%)
 
 
 # dependent directories
 $(TEST_BIN_DIR):
 	mkdir -p $@
 
-$(TEST_UNITS): | $(TEST_BIN_DIR) $(TEST_FRAMEWORK)
+$(TESTS): | $(TEST_BIN_DIR)
 
 
-# unit testing framework
-$(TEST_FRAMEWORK): | $(LIB_DIR)
-	git clone https://github.com/ThrowTheSwitch/Unity.git $@
+# Unity
+unity:
+	cmake -S lib/unity -B lib/unity/build
+	sudo cmake --build lib/unity/build --target install/local
 
 
 # tests
-$(TEST_BIN_DIR)/%: $(TEST_UNIT_DIR)/%.c $(TEST_FRAMEWORK_SRC) $(OBJS)
-	$(CC) $(TEST_FRAMEWORK_INCLUDE) $(CFLAGS) $^ -o $@
+$(TEST_BIN_DIR)/%: $(TEST_UNIT_DIR)/%.c $(OBJS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -lunity -o $@
 
 
-unittests: $(TEST_UNITS)
+unittests: $(TESTS)
 	for test in $^; do \
 		echo "\n*****TEST $$test*****"; \
 		set -e; \
 		./$$test; \
 	done
-
-tests: $(TARGET) unittests
-	./test_dish.sh $< $(TEST_DIR)/data

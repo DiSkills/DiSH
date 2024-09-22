@@ -1,16 +1,17 @@
 CC = gcc
-CFLAGS = -ggdb -Wall -I./
+CFLAGS = -ggdb -Wall
+CPPFLAGS = -I./ -isystem/usr/local/include
+
+LDFLAGS = -L/usr/local/lib
 
 BIN_DIR = bin
-LIB_DIR = lib
 BUILD_DIR = build
 
 TARGET = $(BIN_DIR)/dish
 
 SRC_DIR = src
-SRC_MODULES = str.c wordlist.c line.c message.c cmd.c
-SRCS = $(SRC_MODULES:%=$(SRC_DIR)/%)
-OBJS = $(SRC_MODULES:%.c=$(BUILD_DIR)/%.o)
+SRCS = $(filter-out $(SRC_DIR)/main.c, $(wildcard $(SRC_DIR)/*.c))
+OBJS = $(SRCS:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
 
 
 # dependent directories
@@ -24,9 +25,6 @@ $(BIN_DIR):
 
 $(TARGET): | $(BIN_DIR)
 
-$(LIB_DIR):
-	mkdir -p $@
-
 
 # dependencies for objects
 $(BUILD_DIR)/deps.mk: $(SRCS) | $(BUILD_DIR)
@@ -39,10 +37,10 @@ endif
 
 # build
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c $(SRC_DIR)/%.h
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -c $< -o $@
 
 $(TARGET): $(SRC_DIR)/main.c $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $^ -o $@
 
 
 # include tests
@@ -53,5 +51,8 @@ all: $(TARGET)
 clean:
 	rm -rf $(BIN_DIR) $(BUILD_DIR)
 
-.PHONY: all unittests tests clean
+submodules:
+	git submodule update --init --recursive
+
+.PHONY: all unittests clean unity submodules
 .DEFAULT_GOAL := all
