@@ -14,8 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Unity Test Framework
-        run: make lib/unity
+      - name: Update submodules
+        run: make submodules
 
-      - name: Make tests
-        run: make tests
+      - name: Setup Unity Test Framework
+        run: make unity
+
+      - name: Make unittests
+        run: make unittests
+
+      - name: Make functests
+        run: make functests

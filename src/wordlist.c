@@ -44,3 +44,31 @@ void wordlist_push_back(struct wordlist_t *wordlist, const char *word)
     }
     wordlist->last = tmp;
 }
+
+
+void wordlist_traverse(struct wordlist_t *wordlist,
+        wordlist_callback callback, void *userdata)
+{
+    struct wordlist_item *p;
+
+    for (p = wordlist->first; p; p = p->next) {
+        callback(p, userdata);
+    }
+}
+
+
+static void callback_length(struct wordlist_item *p, void *userdata)
+{
+    int *length = userdata;
+    (*length)++;
+}
+
+
+int wordlist_length(const struct wordlist_t *wordlist)
+{
+    int length = 0;
+
+    wordlist_traverse((struct wordlist_t *)wordlist,
+            callback_length, &length);
+    return length;
+}

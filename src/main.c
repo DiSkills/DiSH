@@ -1,15 +1,31 @@
 #include <stdio.h>
 
-#include "line.h"
+#include "cmd.h"
 #include "message.h"
 
 
+#if 0
 static void line_print(const struct line_t *line)
 {
     const struct wordlist_item *p;
     for (p = line->wordlist.first; p; p = p->next) {
         printf("[%s]\n", p->word);
     }
+}
+#endif
+
+
+static void line_exec(struct line_t *line)
+{
+    struct cmd_t cmd;
+    cmd_init_from_line(&cmd, line);
+
+    cmd_exec(&cmd);
+    if (cmd.state == state_launched) {
+        cmd_wait(&cmd);
+    }
+
+    cmd_del(&cmd);
 }
 
 
@@ -36,7 +52,7 @@ int main()
         if (line.errno != noerror) {
             line_print_error(&line);
         } else {
-            line_print(&line);
+            line_exec(&line);
         }
         line_clear(&line);
         printf("%s ", msg_welcome);
