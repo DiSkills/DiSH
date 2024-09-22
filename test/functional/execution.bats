@@ -85,3 +85,12 @@ EOF
     assert_success
     assert_output "$w baddir: No such file or directory""$newline""$w "
 }
+
+
+@test "Check error for cd by number of arguments" {
+    run dish <<EOF
+cd dir1 dir2
+EOF
+    assert_success
+    assert_output "$w cd: too many arguments""$newline""$w "
+}
