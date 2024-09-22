@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Unity Test Framework
-        run: make lib/unity
+      - name: Update submodules
+        run: git submodule update --init --recursive
 
-      - name: Make tests
-        run: make tests
+      - name: Make unittests
+        run: make unittests

@@ -7,6 +7,13 @@ TEST_UNITS = $(wildcard $(TEST_UNIT_DIR)/*.c)
 TESTS = $(TEST_UNITS:$(TEST_UNIT_DIR)/%.c=$(TEST_BIN_DIR)/%)
 
 
+install_unity:
+	cd lib/unity/
+	mkdir -p build && cd build && cmake ..
+	cmake --build .
+	make install/local
+
+
 # dependent directories
 $(TEST_BIN_DIR):
 	mkdir -p $@
