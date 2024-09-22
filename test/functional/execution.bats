@@ -32,3 +32,21 @@ EOF
     assert_success
     assert_output "$w "
 }
+
+
+@test "Print an error message for unmatched quotes" {
+    run dish <<EOF
+$PRINT_ARGS "Hello, ""World!
+EOF
+    assert_success
+    assert_output "$w $msg_line_error_quotes""$newline""$w "
+}
+
+
+@test "Print an error message for an unsupported escape sequence" {
+    run dish <<EOF
+$PRINT_ARGS Hello \\World!
+EOF
+    assert_success
+    assert_output "$w $msg_line_error_escape""$newline""$w "
+}
