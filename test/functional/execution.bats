@@ -66,3 +66,13 @@ EOF
 [\\]
 $w "
 }
+
+
+@test "Check cd" {
+    run dish <<EOF
+cd test
+pwd
+EOF
+    assert_success
+    assert_output "$w $w "`cd test && pwd`"$newline""$w "
+}
