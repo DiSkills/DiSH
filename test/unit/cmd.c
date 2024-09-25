@@ -17,13 +17,10 @@ void tearDown()
 
 static void fill_cmd(struct cmd_t *cmd, const char *s, enum cmd_states state)
 {
-    int i;
     struct line_t line;
 
     line_init(&line);
-    for (i = 0; s[i]; i++) {
-        line_process_char(&line, s[i]);
-    }
+    line_from_chars(&line, s);
     cmd_init_from_line(cmd, &line);
     cmd->state = state;
 
@@ -33,15 +30,12 @@ static void fill_cmd(struct cmd_t *cmd, const char *s, enum cmd_states state)
 
 static void test_init_from_line()
 {
-    int i;
     struct cmd_t cmd;
     struct line_t line;
     const char s[] = "ls -l -a /\n";
 
     line_init(&line);
-    for (i = 0; s[i]; i++) {
-        line_process_char(&line, s[i]);
-    }
+    line_from_chars(&line, s);
 
     cmd_init_from_line(&cmd, &line);
     TEST_ASSERT_EQUAL_STRING("ls", cmd.name);
