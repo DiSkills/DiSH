@@ -31,7 +31,7 @@ static void line_exec(struct line_t *line)
 
 static void line_print_error(const struct line_t *line)
 {
-    fprintf(stderr, "%s: %s\n", msg_error, line_get_error_msg(line));
+    fprintf(stderr, "%s: %s\n", msg_error, line_strerror(line));
 }
 
 

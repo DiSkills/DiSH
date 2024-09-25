@@ -39,7 +39,7 @@ void line_clear(struct line_t *line)
 }
 
 
-const char *line_get_error_msg(const struct line_t *line)
+const char *line_strerror(const struct line_t *line)
 {
     switch (line->errno) {
         case error_quotes:
@@ -143,4 +143,16 @@ void line_process_char(struct line_t *line, char c)
         line_set_error(line, error_quotes);
     }
     line->word_is_empty = 0;
+}
+
+
+void line_from_chars(struct line_t *line, const char *s)
+{
+    for (; *s; s++) {
+        line_process_char(line, *s);
+    }
+
+    if (!line->is_finished) {
+        line_process_char(line, '\n');
+    }
 }
