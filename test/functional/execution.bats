@@ -15,63 +15,89 @@ setup() {
 
 
 @test "ignore empty line" {
+    expected="$w "
+    expected+="$w "
+
     run dish <<EOF
 
 EOF
     assert_success
-    assert_output "$w $w "
+    assert_output "$expected"
 }
 
 
 @test "exit by Ctrl-D" {
+    expected="$w "
+
     run dish <<EOF
 EOF
     assert_success
-    assert_output "$w "
+    assert_output "$expected"
 }
 
 
 @test "cd: invalid number of arguments" {
-    run dish <<EOF
-cd dir1 dir2
-EOF
+    cmd="cd dir1 dir2"
+
+    expected="$w "
+    expected+="cd: too many arguments""$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd"
     assert_success
-    assert_output "$w cd: too many arguments""$newline""$w "
+    assert_output "$expected"
 }
 
 
 @test "cd: error from chdir" {
-    run dish <<EOF
-cd baddir
-EOF
+    cmd="cd baddir"
+
+    expected="$w "
+    expected+="baddir: No such file or directory""$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd"
     assert_success
-    assert_output "$w baddir: No such file or directory""$newline""$w "
+    assert_output "$expected"
 }
 
 
 @test "cd: works correctly" {
-    run dish <<EOF
-cd test
-pwd
-EOF
+    cmd1="cd test"
+    cmd2="pwd"
+
+    expected="$w "
+    expected+="$w "
+    expected+=`$cmd1 && $cmd2`"$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd1""$newline""$cmd2"
     assert_success
-    assert_output "$w $w "`cd test && pwd`"$newline""$w "
+    assert_output "$expected"
 }
 
 
 @test "execute program: invalid program name" {
-    run dish <<EOF
-badname
-EOF
+    cmd="badcmd"
+
+    expected="$w "
+    expected+="$cmd: No such file or directory""$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd"
     assert_success
-    assert_output "$w badname: No such file or directory""$newline""$w "
+    assert_output "$expected"
 }
 
 
 @test "execute program: works correctly" {
-    run dish <<EOF
-ls -lh -a
-EOF
+    cmd="ls -lh -a"
+
+    expected="$w "
+    expected+=`$cmd`"$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd"
     assert_success
-    assert_output "$w ""`ls -lh -a`""$newline""$w "
+    assert_output "$expected"
 }

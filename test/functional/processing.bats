@@ -18,34 +18,46 @@ setup() {
 
 
 @test "string processing: unmatched quotes error" {
-    run dish <<EOF
-$PRINT_ARGS "Hello, ""World!
-EOF
+    cmd="$PRINT_ARGS \"Hello, \"\"World!"
+
+    expected="$w "
+    expected+="$msg_line_error_quotes""$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd"
     assert_success
-    assert_output "$w $msg_line_error_quotes""$newline""$w "
+    assert_output "$expected"
 }
 
 
 @test "string processing: escape sequence error" {
-    run dish <<EOF
-$PRINT_ARGS Hello \\World!
-EOF
+    cmd="$PRINT_ARGS Hello \\World!"
+
+    expected="$w "
+    expected+="$msg_line_error_escape""$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd"
     assert_success
-    assert_output "$w $msg_line_error_escape""$newline""$w "
+    assert_output "$expected"
 }
 
 
 @test "string processing: works correctly" {
-    run dish <<EOF
-$PRINT_ARGS "Hello, World!" "" My name"" ""is \\"DiSkills\\" \\\\
-EOF
+    cmd="$PRINT_ARGS \"Hello, World!\" \"\" "
+    cmd+="My name\"\" \"\"is \\\"DiSkills\\\" \\\\"
+
+    expected="$w "
+    expected+="[Hello, World!]""$newline"
+    expected+="[]""$newline"
+    expected+="[My]""$newline"
+    expected+="[name]""$newline"
+    expected+="[is]""$newline"
+    expected+="[\"DiSkills\"]""$newline"
+    expected+="[\\]""$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd"
     assert_success
-    assert_output "$w [Hello, World!]
-[]
-[My]
-[name]
-[is]
-[\"DiSkills\"]
-[\\]
-$w "
+    assert_output "$expected"
 }
