@@ -14,10 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Update submodules
+      - name: Updating submodules
         run: make submodules
 
-      - name: Setup Unity Test Framework
+      - name: Setting up a Unity testing framework
         run: make unity
 
       - name: Make unittests
