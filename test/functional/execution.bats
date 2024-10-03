@@ -77,6 +77,36 @@ EOF
 }
 
 
+@test "cd: home directory undefined" {
+    unset HOME
+
+    cmd="cd"
+
+    expected="$w "
+    expected+="HOME: unknown path to home directory""$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd"
+    assert_success
+    assert_output "$expected"
+}
+
+
+@test "cd: home directory defined" {
+    cmd1="cd"
+    cmd2="pwd"
+
+    expected="$w "
+    expected+="$w "
+    expected+=`$cmd1 && $cmd2`"$newline"
+    expected+="$w "
+
+    run dish <<<"$cmd1""$newline""$cmd2"
+    assert_success
+    assert_output "$expected"
+}
+
+
 @test "execute program: invalid program name" {
     cmd="badcmd"
 
