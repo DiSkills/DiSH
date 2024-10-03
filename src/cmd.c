@@ -53,19 +53,28 @@ void cmd_del(struct cmd_t *cmd)
 static void cd(struct cmd_t *cmd)
 {
     int cdr;
+    char *path;
 
     cmd->pid = 0;
     cmd->code = 1;
     cmd->state = state_exited;
 
-    if (cmd->argc != 2) {
+    if (cmd->argc > 2) {
         fprintf(stderr, "cd: too many arguments\n");
         return;
+    } else if (cmd->argc == 2) {
+        path = cmd->argv[1];
+    } else {
+        path = getenv("HOME");
+        if (!path) {
+            fprintf(stderr, "%s: %s\n", "HOME", "unknown path to home directory");
+            return;
+        }
     }
 
-    cdr = chdir(cmd->argv[1]);
+    cdr = chdir(path);
     if (cdr == -1) {
-        perror(cmd->argv[1]);
+        perror(path);
         return;
     }
     cmd->code = 0;
