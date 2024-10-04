@@ -3,11 +3,11 @@
 
 #include "line.h"
 
-enum cmd_states {
-    state_not_launched = 0,
-    state_launched = 1,
-    state_exited = 2,
-    state_terminated = 3
+enum cmd_state_t {
+    cmd_state_not_launched = 0,
+    cmd_state_launched = 1,
+    cmd_state_exited = 2,
+    cmd_state_terminated = 3
 };
 
 struct cmd_t {
@@ -16,7 +16,7 @@ struct cmd_t {
     int argc;
     char **argv;
 
-    enum cmd_states state;
+    enum cmd_state_t state;
 
     int pid,
         code;
