@@ -56,3 +56,9 @@ int wordlist_length(const struct wordlist_t *wordlist)
     }
     return length;
 }
+
+
+int wordlist_is_empty(const struct wordlist_t *wordlist)
+{
+    return wordlist->first == NULL;
+}

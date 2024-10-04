@@ -8,6 +8,11 @@
 static void line_exec(struct line_t *line)
 {
     struct cmd_t cmd;
+
+    if (wordlist_is_empty(&line->wordlist)) {
+        return;
+    }
+
     cmd_init_from_line(&cmd, line);
 
     cmd_exec(&cmd);

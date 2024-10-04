@@ -101,6 +101,21 @@ static void test_length()
 }
 
 
+static void test_is_empty()
+{
+    struct wordlist_t wordlist;
+    const char word[] = "word";
+
+    wordlist_init(&wordlist);
+    TEST_ASSERT_EQUAL_INT(1, wordlist_is_empty(&wordlist));
+
+    wordlist_push_back(&wordlist, word);
+    TEST_ASSERT_EQUAL_INT(0, wordlist_is_empty(&wordlist));
+
+    wordlist_del(&wordlist);
+}
+
+
 int main()
 {
     UNITY_BEGIN();
@@ -110,6 +125,7 @@ int main()
     RUN_TEST(test_push_back_two_items);
     RUN_TEST(test_del);
     RUN_TEST(test_length);
+    RUN_TEST(test_is_empty);
 
     return UNITY_END();
 }
