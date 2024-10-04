@@ -43,9 +43,9 @@ const char *line_strerror(const struct line_t *line)
 {
     switch (line->errno) {
         case line_error_quotes:
-            return msg_line_error_quotes;
+            return error_quotes;
         case line_error_escape:
-            return msg_line_error_escape;
+            return error_escape;
         default:
             return NULL;
     }
@@ -92,7 +92,7 @@ void line_process_char(struct line_t *line, char c)
         line->is_finished = 1;
     }
 
-    if (line->errno != line_error_noerror) {
+    if (line->errno) {
         return;
     }
 

@@ -3,8 +3,8 @@
 w='>'
 newline=$'\n'
 
-msg_line_error_quotes="Error: unmatched quotes"
-msg_line_error_escape="Error: unsupported escape sequence"
+error_quotes="error: unmatched quotes"
+error_escape="error: unsupported escape sequence"
 
 
 setup() {
@@ -21,7 +21,7 @@ setup() {
     cmd="$PRINT_ARGS \"Hello, \"\"World!"
 
     expected="$w "
-    expected+="$msg_line_error_quotes""$newline"
+    expected+="$error_quotes""$newline"
     expected+="$w "
 
     run dish <<<"$cmd"
@@ -34,7 +34,7 @@ setup() {
     cmd="$PRINT_ARGS Hello \\World!"
 
     expected="$w "
-    expected+="$msg_line_error_escape""$newline"
+    expected+="$error_escape""$newline"
     expected+="$w "
 
     run dish <<<"$cmd"
