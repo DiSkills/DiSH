@@ -15,7 +15,7 @@ void tearDown()
 }
 
 
-static void fill_cmd(struct cmd_t *cmd, const char *s, enum cmd_states state)
+static void fill_cmd(struct cmd_t *cmd, const char *s, enum cmd_state_t state)
 {
     struct line_t line;
 
@@ -49,9 +49,10 @@ static void test_init_from_line()
 
     TEST_ASSERT_EQUAL_PTR(cmd.argv[0], cmd.name);
 
-    TEST_ASSERT_EQUAL_INT(state_not_launched, cmd.state);
+    TEST_ASSERT_EQUAL_INT(cmd_state_not_launched, cmd.state);
 
-    TEST_ASSERT_LINE(line, 0, 0, 0, noerror, mode_split);
+    TEST_ASSERT_LINE(line, 0, 0, 0, line_error_noerror,
+            line_split_mode_split);
     TEST_ASSERT_LINE_WORD_IS_DEFAULT(line);
     TEST_ASSERT_LINE_WORDLIST_IS_EMPTY(line);
 
@@ -63,13 +64,13 @@ static void test_init_from_line()
 static void test_del()
 {
     struct cmd_t cmd;
-    fill_cmd(&cmd, "ls -l\n", state_terminated);
+    fill_cmd(&cmd, "ls -l\n", cmd_state_terminated);
 
     cmd_del(&cmd);
     TEST_ASSERT_NULL(cmd.name);
     TEST_ASSERT_EQUAL_INT(0, cmd.argc);
     TEST_ASSERT_NULL(cmd.argv);
-    TEST_ASSERT_EQUAL_INT(state_not_launched, cmd.state);
+    TEST_ASSERT_EQUAL_INT(cmd_state_not_launched, cmd.state);
 }
 
 

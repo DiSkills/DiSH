@@ -40,7 +40,7 @@ EOF
     cmd="cd dir1 dir2"
 
     expected="$w "
-    expected+="cd: too many arguments""$newline"
+    expected+="error: cd: too many arguments""$newline"
     expected+="$w "
 
     run dish <<<"$cmd"
@@ -83,7 +83,7 @@ EOF
     cmd="cd"
 
     expected="$w "
-    expected+="HOME: unknown path to home directory""$newline"
+    expected+="error: cd: unknown path to home directory""$newline"
     expected+="$w "
 
     run dish <<<"$cmd"

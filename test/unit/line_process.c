@@ -5,25 +5,29 @@
 #include "src/line.h"
 
 
+static struct line_t line;
+static const struct wordlist_item_t *item;
+
+
 void setUp()
 {
+    line_init(&line);
 }
 
 
 void tearDown()
 {
+    line_del(&line);
 }
 
 
 static void test_correctly()
 {   /* abra sch"wa"bra" "kadabra    foo"    b"ar */
-    struct line_t line;
-    const struct wordlist_item *item;
     const char s[] = "abra sch\"wa\"bra\" \"kadabra\tfoo\"\tb\"ar";
-    line_init(&line);
 
     line_from_chars(&line, s);
-    TEST_ASSERT_LINE(line, 1, 0, 0, noerror, mode_split);
+    TEST_ASSERT_LINE(line, 1, 0, 0, line_error_noerror,
+            line_split_mode_split);
     TEST_ASSERT_LINE_WORD(line, 0, 32, "");
 
     item = line.wordlist.first;
@@ -35,21 +39,17 @@ static void test_correctly()
     item = item->next;
     TEST_ASSERT_EQUAL_STRING("foo\tbar", item->word);
     TEST_ASSERT_NULL(item->next);
-
-    line_del(&line);
 }
 
 
 static void test_escape_sequence_correctly()
 {   /* It\"s the \\correct\\ "\"escape\" sequence" */
-    struct line_t line;
-    struct wordlist_item *item;
     const char s[] =
         "It\\\"s the \\\\correct\\\\ \"\\\"escape\\\" sequence\"";
-    line_init(&line);
 
     line_from_chars(&line, s);
-    TEST_ASSERT_LINE(line, 1, 0, 0, noerror, mode_split);
+    TEST_ASSERT_LINE(line, 1, 0, 0, line_error_noerror,
+            line_split_mode_split);
     TEST_ASSERT_LINE_WORD(line, 0, 32, "");
 
     item = line.wordlist.first;
@@ -64,21 +64,17 @@ static void test_escape_sequence_correctly()
     item = item->next;
     TEST_ASSERT_EQUAL_STRING("\"escape\" sequence", item->word);
     TEST_ASSERT_NULL(item->next);
-
-    line_del(&line);
 }
 
 
 static void test_empty_word_correctly()
 {   /* abra"" "" ""\\ schw""abra """"  ""kadabra "" */
-    struct line_t line;
-    struct wordlist_item *item;
     const char s[] =
         "abra\"\" \"\" \"\"\\\\ schw\"\"abra \"\"\"\"\t\"\"kadabra \"\"";
-    line_init(&line);
 
     line_from_chars(&line, s);
-    TEST_ASSERT_LINE(line, 1, 0, 0, noerror, mode_split);
+    TEST_ASSERT_LINE(line, 1, 0, 0, line_error_noerror,
+            line_split_mode_split);
     TEST_ASSERT_LINE_WORD_IS_DEFAULT(line);
 
     item = line.wordlist.first;
@@ -102,20 +98,16 @@ static void test_empty_word_correctly()
     item = item->next;
     TEST_ASSERT_EQUAL_STRING("", item->word);
     TEST_ASSERT_NULL(item->next);
-
-    line_del(&line);
 }
 
 
 static void test_error_unmatched_quotes()
 {   /* abra "schwabra kadabra"  "foo */
-    struct line_t line;
-    struct wordlist_item *item;
     const char s[] = "abra \"schwabra kadabra\"\t\"foo";
-    line_init(&line);
 
     line_from_chars(&line, s);
-    TEST_ASSERT_LINE(line, 1, 0, 0, error_quotes, mode_nosplit);
+    TEST_ASSERT_LINE(line, 1, 0, 0, line_error_quotes,
+            line_split_mode_nosplit);
     TEST_ASSERT_LINE_WORD(line, 4, 32, "foo\n");
 
     item = line.wordlist.first;
@@ -124,20 +116,16 @@ static void test_error_unmatched_quotes()
     item = item->next;
     TEST_ASSERT_EQUAL_STRING("schwabra kadabra", item->word);
     TEST_ASSERT_NULL(item->next);
-
-    line_del(&line);
 }
 
 
 static void test_error_unsupported_escape_sequence()
 {   /* It's \"an\" unsupported\? escape sequence */
-    struct line_t line;
-    struct wordlist_item *item;
     const char s[] = "It's \\\"an\\\" unsupported\\? escape sequence";
-    line_init(&line);
 
     line_from_chars(&line, s);
-    TEST_ASSERT_LINE(line, 1, 1, 0, error_escape, mode_split);
+    TEST_ASSERT_LINE(line, 1, 1, 0, line_error_escape,
+            line_split_mode_split);
     TEST_ASSERT_LINE_WORD(line, 11, 16, "unsupported");
 
     item = line.wordlist.first;
@@ -146,27 +134,21 @@ static void test_error_unsupported_escape_sequence()
     item = item->next;
     TEST_ASSERT_EQUAL_STRING("\"an\"", item->word);
     TEST_ASSERT_NULL(item->next);
-
-    line_del(&line);
 }
 
 
 static void test_check_to_save_first_error()
 {   /* check "to save\? the first error */
-    struct line_t line;
-    struct wordlist_item *item;
     const char s[] = "check \"to save\\? the first error";
-    line_init(&line);
 
     line_from_chars(&line, s);
-    TEST_ASSERT_LINE(line, 1, 1, 0, error_escape, mode_nosplit);
+    TEST_ASSERT_LINE(line, 1, 1, 0, line_error_escape,
+            line_split_mode_nosplit);
     TEST_ASSERT_LINE_WORD(line, 7, 16, "to save");
 
     item = line.wordlist.first;
     TEST_ASSERT_EQUAL_STRING("check", item->word);
     TEST_ASSERT_NULL(item->next);
-
-    line_del(&line);
 }
 
 

@@ -5,33 +5,35 @@
 #include <unistd.h>
 
 #include "cmd.h"
+#include "error.h"
 
 
-static void callback_move_to_argv(struct wordlist_item *p, void *userdata)
+static void wordlist_to_argv(char **argv, struct wordlist_t *wordlist)
 {
-    char ***pargv = userdata;
+    while (wordlist->first) {
+        struct wordlist_item_t *tmp;
 
-    **pargv = p->word;
-    p->word = NULL;
-    (*pargv)++;
+        tmp = wordlist->first;
+        wordlist->first = tmp->next;
+
+        *argv = tmp->word;
+        argv++;
+
+        free(tmp);
+    }
+    wordlist->last = NULL;
+    *argv = NULL;
 }
 
 
 void cmd_init_from_line(struct cmd_t *cmd, struct line_t *line)
 {
-    char **argv;
-
     cmd->argc = wordlist_length(&line->wordlist);
     cmd->argv = malloc((cmd->argc + 1) * sizeof(*cmd->argv));
+    wordlist_to_argv(cmd->argv, &line->wordlist);
 
-    /* fill in argv */
-    argv = cmd->argv;
-    wordlist_traverse(&line->wordlist, callback_move_to_argv, &argv);
-    cmd->argv[cmd->argc] = NULL;
-
-    /* fill in additional fields */
     cmd->name = cmd->argv[0];
-    cmd->state = state_not_launched;
+    cmd->state = cmd_state_not_launched;
 
     line_clear(line);
 }
@@ -46,7 +48,7 @@ void cmd_del(struct cmd_t *cmd)
 
     cmd->argv = NULL;
     cmd->name = NULL;
-    cmd->state = state_not_launched;
+    cmd->state = cmd_state_not_launched;
 }
 
 
@@ -57,17 +59,17 @@ static void cd(struct cmd_t *cmd)
 
     cmd->pid = 0;
     cmd->code = 1;
-    cmd->state = state_exited;
+    cmd->state = cmd_state_exited;
 
     if (cmd->argc > 2) {
-        fprintf(stderr, "cd: too many arguments\n");
+        print_error(error_cd_many_args);
         return;
     } else if (cmd->argc == 2) {
         path = cmd->argv[1];
     } else {
         path = getenv("HOME");
         if (!path) {
-            fprintf(stderr, "%s: %s\n", "HOME", "unknown path to home directory");
+            print_error(error_cd_home);
             return;
         }
     }
@@ -94,7 +96,7 @@ static void exec(struct cmd_t *cmd)
         perror(cmd->name);
         exit(1);
     }
-    cmd->state = state_launched;
+    cmd->state = cmd_state_launched;
 }
 
 
@@ -124,9 +126,9 @@ void cmd_wait(struct cmd_t *cmd)
 
     if (WIFEXITED(cmd->code)) {
         cmd->code = WEXITSTATUS(cmd->code);
-        cmd->state = state_exited;
+        cmd->state = cmd_state_exited;
     } else {
         cmd->code = WTERMSIG(cmd->code);
-        cmd->state = state_terminated;
+        cmd->state = cmd_state_terminated;
     }
 }
