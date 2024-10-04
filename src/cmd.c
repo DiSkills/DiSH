@@ -11,7 +11,7 @@
 static void wordlist_to_argv(char **argv, struct wordlist_t *wordlist)
 {
     while (wordlist->first) {
-        struct wordlist_item *tmp;
+        struct wordlist_item_t *tmp;
 
         tmp = wordlist->first;
         wordlist->first = tmp->next;

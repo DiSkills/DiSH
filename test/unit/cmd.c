@@ -51,7 +51,8 @@ static void test_init_from_line()
 
     TEST_ASSERT_EQUAL_INT(cmd_state_not_launched, cmd.state);
 
-    TEST_ASSERT_LINE(line, 0, 0, 0, line_error_noerror, line_split_mode_split);
+    TEST_ASSERT_LINE(line, 0, 0, 0, line_error_noerror,
+            line_split_mode_split);
     TEST_ASSERT_LINE_WORD_IS_DEFAULT(line);
     TEST_ASSERT_LINE_WORDLIST_IS_EMPTY(line);
 
