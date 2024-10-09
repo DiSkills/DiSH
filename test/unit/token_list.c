@@ -88,5 +88,5 @@ int main()
     RUN_TEST(test_del);
     RUN_TEST(test_push);
 
-    UNITY_END();
+    return UNITY_END();
 }
