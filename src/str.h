@@ -1,6 +1,10 @@
 #ifndef STR_H
 #define STR_H
 
+enum {
+    str_min_size = 16
+};
+
 struct str_t {
     unsigned len,
              size;

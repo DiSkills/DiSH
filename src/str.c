@@ -4,11 +4,6 @@
 #include "str.h"
 
 
-enum {
-    str_min_size = 16
-};
-
-
 void str_init_from_array(struct str_t *str, const char *s)
 {
     str->len = strlen(s);
