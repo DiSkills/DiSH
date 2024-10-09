@@ -1,0 +1,15 @@
+#define TEST_ASSERT_LEXER_BUFFER(LEXER, LEN, SIZE, STR) \
+    TEST_ASSERT_EQUAL_INT(LEN, LEXER.buffer.len); \
+    TEST_ASSERT_EQUAL_INT(SIZE, LEXER.buffer.size); \
+    TEST_ASSERT_EQUAL_STRING(STR, LEXER.buffer.data);
+
+
+#define TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(LEXER) \
+    TEST_ASSERT_EQUAL_INT(0, LEXER.tokens.length); \
+    TEST_ASSERT_NULL(LEXER.tokens.head); \
+    TEST_ASSERT_NULL(LEXER.tokens.tail);
+
+
+#define TEST_ASSERT_LEXER_TOKENS_TAIL(LEXER, TOKEN, TYPE) \
+    TEST_ASSERT_EQUAL_INT(TYPE, LEXER.tokens.tail->token.type); \
+    TEST_ASSERT_EQUAL_STRING(TOKEN, LEXER.tokens.tail->token.content);
