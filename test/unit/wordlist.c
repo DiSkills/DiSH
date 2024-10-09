@@ -1,4 +1,4 @@
-#include <unity.h>
+#include <unity/unity.h>
 
 #include "src/wordlist.h"
 
@@ -78,6 +78,44 @@ static void test_del()
 }
 
 
+static void test_length()
+{
+    int length;
+    struct wordlist_t wordlist;
+    const char first[] = "The first",
+          second[] = "The second";
+
+    wordlist_init(&wordlist);
+    length = wordlist_length(&wordlist);
+    TEST_ASSERT_EQUAL_INT(0, length);
+
+    wordlist_push_back(&wordlist, first);
+    length = wordlist_length(&wordlist);
+    TEST_ASSERT_EQUAL_INT(1, length);
+
+    wordlist_push_back(&wordlist, second);
+    length = wordlist_length(&wordlist);
+    TEST_ASSERT_EQUAL_INT(2, length);
+
+    wordlist_del(&wordlist);
+}
+
+
+static void test_is_empty()
+{
+    struct wordlist_t wordlist;
+    const char word[] = "word";
+
+    wordlist_init(&wordlist);
+    TEST_ASSERT_EQUAL_INT(1, wordlist_is_empty(&wordlist));
+
+    wordlist_push_back(&wordlist, word);
+    TEST_ASSERT_EQUAL_INT(0, wordlist_is_empty(&wordlist));
+
+    wordlist_del(&wordlist);
+}
+
+
 int main()
 {
     UNITY_BEGIN();
@@ -86,6 +124,8 @@ int main()
     RUN_TEST(test_push_back_first_item);
     RUN_TEST(test_push_back_two_items);
     RUN_TEST(test_del);
+    RUN_TEST(test_length);
+    RUN_TEST(test_is_empty);
 
     return UNITY_END();
 }

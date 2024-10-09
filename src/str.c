@@ -5,7 +5,7 @@
 
 
 enum {
-    min_str_size = 16
+    str_min_size = 16
 };
 
 
@@ -20,8 +20,8 @@ void str_init_from_array(struct str_t *str, const char *s)
 
 void str_init(struct str_t *str)
 {
-    str->data = malloc(min_str_size);
-    str->size = min_str_size;
+    str->data = malloc(str_min_size);
+    str->size = str_min_size;
     str_clear(str);
 }
 

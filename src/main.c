@@ -1,21 +1,26 @@
 #include <stdio.h>
 
-#include "line.h"
+#include "cmd.h"
+#include "error.h"
 #include "message.h"
 
 
-static void line_print(const struct line_t *line)
+static void line_exec(struct line_t *line)
 {
-    const struct wordlist_item *p;
-    for (p = line->wordlist.first; p; p = p->next) {
-        printf("[%s]\n", p->word);
+    struct cmd_t cmd;
+
+    if (wordlist_is_empty(&line->wordlist)) {
+        return;
     }
-}
 
+    cmd_init_from_line(&cmd, line);
 
-static void line_print_error(const struct line_t *line)
-{
-    fprintf(stderr, "%s: %s\n", msg_error, line_get_error_msg(line));
+    cmd_exec(&cmd);
+    if (cmd.state == cmd_state_launched) {
+        cmd_wait(&cmd);
+    }
+
+    cmd_del(&cmd);
 }
 
 
@@ -25,21 +30,20 @@ int main()
     struct line_t line;
 
     line_init(&line);
-    printf("%s ", msg_welcome);
+    printf("%s ", msg_prompt);
     while ((c = getchar()) != EOF) {
         line_process_char(&line, c);
-
         if (!line.is_finished) {
             continue;
         }
 
-        if (line.errno != noerror) {
-            line_print_error(&line);
+        if (line.errno) {
+            print_error(line_strerror(&line));
         } else {
-            line_print(&line);
+            line_exec(&line);
         }
         line_clear(&line);
-        printf("%s ", msg_welcome);
+        printf("%s ", msg_prompt);
     }
     line_del(&line);
     return 0;
