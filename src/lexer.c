@@ -217,6 +217,28 @@ static void lexer_escaping_in_string(struct lexer_t *lexer, char c)
 }
 
 
+static void lexer_reading_string(struct lexer_t *lexer, char c)
+{
+    switch (c) {
+        case '\\':
+            lexer->state = lexer_state_escaping_in_string;
+            return;
+
+        case '"':
+            lexer->state = lexer_state_reading_word;
+            return;
+
+        case '\n':
+            lexer->state = lexer_state_error;
+            lexer->errno = lexer_error_quotes;
+            return;
+
+        default:
+            str_append(&lexer->buffer, c);
+    }
+}
+
+
 void lexer_process_char(struct lexer_t *lexer, char c)
 {
     switch (lexer->state) {
@@ -237,7 +259,7 @@ void lexer_process_char(struct lexer_t *lexer, char c)
             return;
 
         case lexer_state_reading_string:
-            /* TODO */
+            lexer_reading_string(lexer, c);
             return;
         case lexer_state_escaping_in_string:
             lexer_escaping_in_string(lexer, c);
