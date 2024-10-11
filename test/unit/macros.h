@@ -7,3 +7,7 @@
     TEST_ASSERT_EQUAL_INT(0, LEXER.tokens.length); \
     TEST_ASSERT_NULL(LEXER.tokens.head); \
     TEST_ASSERT_NULL(LEXER.tokens.tail);
+
+#define TEST_ASSERT_LEXER_TOKENS_TAIL(LEXER, TOKEN, TYPE) \
+    TEST_ASSERT_EQUAL_INT(TYPE, LEXER.tokens.tail->token.type); \
+    TEST_ASSERT_EQUAL_STRING(TOKEN, LEXER.tokens.tail->token.content);
