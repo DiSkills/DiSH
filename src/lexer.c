@@ -83,11 +83,66 @@ static void lexer_initial(struct lexer_t *lexer, char c)
 }
 
 
+static void lexer_pipe(struct lexer_t *lexer, char c)
+{
+    if (c == '|') {
+        lexer->state = lexer_state_double_pipe;
+        str_append(&lexer->buffer, c);
+    } else {
+        lexer->state = lexer_state_initial;
+        lexer_add_token(lexer, token_type_delimiter);
+        lexer_process_char(lexer, c);
+    }
+}
+
+
 void lexer_process_char(struct lexer_t *lexer, char c)
 {
     switch (lexer->state) {
         case lexer_state_initial:
             lexer_initial(lexer, c);
+            return;
+
+        case lexer_state_error:
+            /* TODO */
+            return;
+        case lexer_state_completed:
+            /* TODO */
+            return;
+
+        case lexer_state_reading_word:
+            /* TODO */
+            return;
+        case lexer_state_escaping_in_word:
+            /* TODO */
+            return;
+
+        case lexer_state_reading_string:
+            /* TODO */
+            return;
+        case lexer_state_escaping_in_string:
+            /* TODO */
+            return;
+
+        case lexer_state_pipe:
+            lexer_pipe(lexer, c);
+            return;
+        case lexer_state_double_pipe:
+            /* TODO */
+            return;
+
+        case lexer_state_ampersand:
+            /* TODO */
+            return;
+        case lexer_state_double_ampersand:
+            /* TODO */
+            return;
+
+        case lexer_state_greater:
+            /* TODO */
+            return;
+        case lexer_state_double_greater:
+            /* TODO */
             return;
     }
 }

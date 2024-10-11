@@ -8,6 +8,18 @@
 static struct lexer_t lexer;
 
 
+static void lexer_set_state(struct lexer_t *lexer, enum lexer_state_t state,
+        enum lexer_error_t errno, const char *buffer)
+{
+    lexer->state = state;
+    lexer->errno = errno;
+
+    for (; buffer && *buffer; buffer++) {
+        str_append(&lexer->buffer, *buffer);
+    }
+}
+
+
 void setUp()
 {
     lexer_init(&lexer);
@@ -165,6 +177,32 @@ static void test_initial_to_greater()
 /* ======================================================================== */
 
 
+/* ================================= pipe ================================= */
+static void test_pipe_to_double_pipe()
+{
+    lexer_set_state(&lexer, lexer_state_pipe, lexer_error_noerror, "|");
+    lexer_process_char(&lexer, '|');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_double_pipe, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 2, str_min_size, "||");
+    TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(lexer);
+}
+
+
+static void test_pipe_adding_delimiter()
+{
+    lexer_set_state(&lexer, lexer_state_pipe, lexer_error_noerror, "|");
+    lexer_process_char(&lexer, 'a');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_reading_word, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "a");
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "|", token_type_delimiter);
+}
+/* ======================================================================== */
+
+
 int main()
 {
     UNITY_BEGIN();
@@ -186,6 +224,11 @@ int main()
     RUN_TEST(test_initial_to_pipe);
     RUN_TEST(test_initial_to_ampersand);
     RUN_TEST(test_initial_to_greater);
+/* ======================================================================== */
+
+/* ================================= pipe ================================= */
+    RUN_TEST(test_pipe_to_double_pipe);
+    RUN_TEST(test_pipe_adding_delimiter);
 /* ======================================================================== */
 
     return UNITY_END();
