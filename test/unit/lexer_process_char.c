@@ -339,6 +339,47 @@ static void test_double_greater_adding_delimiter()
 /* ======================================================================== */
 
 
+/* =========================== escaping in word =========================== */
+static void test_escaping_in_word_to_error()
+{
+    lexer_set_state(&lexer, lexer_state_escaping_in_word,
+            lexer_error_noerror, "");
+    lexer_process_char(&lexer, 'a');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_error, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_escape, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 0, str_min_size, "");
+    TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(lexer);
+}
+
+
+static void test_escaping_in_word_to_reading_word_by_backslash()
+{
+    lexer_set_state(&lexer, lexer_state_escaping_in_word,
+            lexer_error_noerror, "");
+    lexer_process_char(&lexer, '\\');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_reading_word, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "\\");
+    TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(lexer);
+}
+
+
+static void test_escaping_in_word_to_reading_word_by_quote()
+{
+    lexer_set_state(&lexer, lexer_state_escaping_in_word,
+            lexer_error_noerror, "");
+    lexer_process_char(&lexer, '"');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_reading_word, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "\"");
+    TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(lexer);
+}
+/* ======================================================================== */
+
+
 int main()
 {
     UNITY_BEGIN();
@@ -390,6 +431,12 @@ int main()
 /* ============================ double greater ============================ */
     RUN_TEST(test_double_greater_to_error);
     RUN_TEST(test_double_greater_adding_delimiter);
+/* ======================================================================== */
+
+/* =========================== escaping in word =========================== */
+    RUN_TEST(test_escaping_in_word_to_error);
+    RUN_TEST(test_escaping_in_word_to_reading_word_by_backslash);
+    RUN_TEST(test_escaping_in_word_to_reading_word_by_quote);
 /* ======================================================================== */
 
     return UNITY_END();

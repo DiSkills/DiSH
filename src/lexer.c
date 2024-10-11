@@ -161,6 +161,18 @@ static void lexer_double_greater(struct lexer_t *lexer, char c)
 }
 
 
+static void lexer_escaping_in_word(struct lexer_t *lexer, char c)
+{
+    if (c == '\\' || c == '"') {
+        lexer->state = lexer_state_reading_word;
+        str_append(&lexer->buffer, c);
+    } else {
+        lexer->state = lexer_state_error;
+        lexer->errno = lexer_error_escape;
+    }
+}
+
+
 void lexer_process_char(struct lexer_t *lexer, char c)
 {
     switch (lexer->state) {
@@ -179,7 +191,7 @@ void lexer_process_char(struct lexer_t *lexer, char c)
             /* TODO */
             return;
         case lexer_state_escaping_in_word:
-            /* TODO */
+            lexer_escaping_in_word(lexer, c);
             return;
 
         case lexer_state_reading_string:
