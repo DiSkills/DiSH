@@ -311,6 +311,34 @@ static void test_greater_adding_delimiter()
 /* ======================================================================== */
 
 
+/* ============================ double greater ============================ */
+static void test_double_greater_to_error()
+{
+    lexer_set_state(&lexer, lexer_state_double_greater,
+            lexer_error_noerror, ">>");
+    lexer_process_char(&lexer, '>');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_error, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_delimiter, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 2, str_min_size, ">>");
+    TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(lexer);
+}
+
+
+static void test_double_greater_adding_delimiter()
+{
+    lexer_set_state(&lexer, lexer_state_double_greater,
+            lexer_error_noerror, ">>");
+    lexer_process_char(&lexer, 'a');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_reading_word, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "a");
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, ">>", token_type_delimiter);
+}
+/* ======================================================================== */
+
+
 int main()
 {
     UNITY_BEGIN();
@@ -357,6 +385,11 @@ int main()
 /* ================================ greater =============================== */
     RUN_TEST(test_greater_to_double_greater);
     RUN_TEST(test_greater_adding_delimiter);
+/* ======================================================================== */
+
+/* ============================ double greater ============================ */
+    RUN_TEST(test_double_greater_to_error);
+    RUN_TEST(test_double_greater_adding_delimiter);
 /* ======================================================================== */
 
     return UNITY_END();

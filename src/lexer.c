@@ -148,6 +148,19 @@ static void lexer_greater(struct lexer_t *lexer, char c)
 }
 
 
+static void lexer_double_greater(struct lexer_t *lexer, char c)
+{
+    if (c == '>') {
+        lexer->state = lexer_state_error;
+        lexer->errno = lexer_error_delimiter;
+    } else {
+        lexer->state = lexer_state_initial;
+        lexer_add_token(lexer, token_type_delimiter);
+        lexer_process_char(lexer, c);
+    }
+}
+
+
 void lexer_process_char(struct lexer_t *lexer, char c)
 {
     switch (lexer->state) {
@@ -194,7 +207,7 @@ void lexer_process_char(struct lexer_t *lexer, char c)
             lexer_greater(lexer, c);
             return;
         case lexer_state_double_greater:
-            /* TODO */
+            lexer_double_greater(lexer, c);
             return;
     }
 }
