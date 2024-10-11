@@ -380,6 +380,73 @@ static void test_escaping_in_word_to_reading_word_by_quote()
 /* ======================================================================== */
 
 
+/* ============================ reading in word =========================== */
+static void test_reading_word_to_escaping_in_word()
+{
+    lexer_set_state(&lexer, lexer_state_reading_word,
+            lexer_error_noerror, "a");
+    lexer_process_char(&lexer, '\\');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_escaping_in_word, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "a");
+    TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(lexer);
+}
+
+
+static void test_reading_word_to_reading_word()
+{
+    lexer_set_state(&lexer, lexer_state_reading_word,
+            lexer_error_noerror, "a");
+    lexer_process_char(&lexer, 'b');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_reading_word, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 2, str_min_size, "ab");
+    TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(lexer);
+}
+
+
+static void test_reading_word_to_reading_string()
+{
+    lexer_set_state(&lexer, lexer_state_reading_word,
+            lexer_error_noerror, "a");
+    lexer_process_char(&lexer, '"');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_reading_string, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "a");
+    TEST_ASSERT_LEXER_TOKENS_IS_EMPTY(lexer);
+}
+
+
+static void test_reading_word_adding_word_by_space()
+{
+    lexer_set_state(&lexer, lexer_state_reading_word,
+            lexer_error_noerror, "a");
+    lexer_process_char(&lexer, ' ');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_initial, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 0, str_min_size, "");
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "a", token_type_word);
+}
+
+
+static void test_reading_word_adding_word_by_delimiter()
+{
+    lexer_set_state(&lexer, lexer_state_reading_word,
+            lexer_error_noerror, "a");
+    lexer_process_char(&lexer, '|');
+
+    TEST_ASSERT_EQUAL_INT(lexer_state_pipe, lexer.state);
+    TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
+    TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "|");
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "a", token_type_word);
+}
+/* ======================================================================== */
+
+
 /* ========================== escaping in string ========================== */
 static void test_escaping_in_string_to_error()
 {
@@ -478,6 +545,14 @@ int main()
     RUN_TEST(test_escaping_in_word_to_error);
     RUN_TEST(test_escaping_in_word_to_reading_word_by_backslash);
     RUN_TEST(test_escaping_in_word_to_reading_word_by_quote);
+/* ======================================================================== */
+
+/* ============================ reading in word =========================== */
+    RUN_TEST(test_reading_word_to_escaping_in_word);
+    RUN_TEST(test_reading_word_to_reading_word);
+    RUN_TEST(test_reading_word_to_reading_string);
+    RUN_TEST(test_reading_word_adding_word_by_space);
+    RUN_TEST(test_reading_word_adding_word_by_delimiter);
 /* ======================================================================== */
 
 /* ========================== escaping in string ========================== */

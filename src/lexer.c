@@ -173,6 +173,38 @@ static void lexer_escaping_in_word(struct lexer_t *lexer, char c)
 }
 
 
+static void lexer_reading_word(struct lexer_t *lexer, char c)
+{
+    switch (c) {
+        case '\\':
+            lexer->state = lexer_state_escaping_in_word;
+            return;
+
+        case '"':
+            lexer->state = lexer_state_reading_string;
+            return;
+
+        case '\n':
+        case ' ':
+        case '\t':
+        case '<':
+        case ';':
+        case '(':
+        case ')':
+        case '|':
+        case '&':
+        case '>':
+            lexer->state = lexer_state_initial;
+            lexer_add_token(lexer, token_type_word);
+            lexer_process_char(lexer, c);
+            return;
+
+        default:
+            str_append(&lexer->buffer, c);
+    }
+}
+
+
 static void lexer_escaping_in_string(struct lexer_t *lexer, char c)
 {
     if (c == '\\' || c == '"') {
@@ -193,14 +225,12 @@ void lexer_process_char(struct lexer_t *lexer, char c)
             return;
 
         case lexer_state_error:
-            /* TODO */
             return;
         case lexer_state_completed:
-            /* TODO */
             return;
 
         case lexer_state_reading_word:
-            /* TODO */
+            lexer_reading_word(lexer, c);
             return;
         case lexer_state_escaping_in_word:
             lexer_escaping_in_word(lexer, c);
