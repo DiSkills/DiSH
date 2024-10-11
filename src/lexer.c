@@ -96,6 +96,19 @@ static void lexer_pipe(struct lexer_t *lexer, char c)
 }
 
 
+static void lexer_double_pipe(struct lexer_t *lexer, char c)
+{
+    if (c == '|') {
+        lexer->state = lexer_state_error;
+        lexer->errno = lexer_error_delimiter;
+    } else {
+        lexer->state = lexer_state_initial;
+        lexer_add_token(lexer, token_type_delimiter);
+        lexer_process_char(lexer, c);
+    }
+}
+
+
 void lexer_process_char(struct lexer_t *lexer, char c)
 {
     switch (lexer->state) {
@@ -128,7 +141,7 @@ void lexer_process_char(struct lexer_t *lexer, char c)
             lexer_pipe(lexer, c);
             return;
         case lexer_state_double_pipe:
-            /* TODO */
+            lexer_double_pipe(lexer, c);
             return;
 
         case lexer_state_ampersand:
