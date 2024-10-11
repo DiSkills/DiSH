@@ -122,6 +122,19 @@ static void lexer_ampersand(struct lexer_t *lexer, char c)
 }
 
 
+static void lexer_double_ampersand(struct lexer_t *lexer, char c)
+{
+    if (c == '&') {
+        lexer->state = lexer_state_error;
+        lexer->errno = lexer_error_delimiter;
+    } else {
+        lexer->state = lexer_state_initial;
+        lexer_add_token(lexer, token_type_delimiter);
+        lexer_process_char(lexer, c);
+    }
+}
+
+
 void lexer_process_char(struct lexer_t *lexer, char c)
 {
     switch (lexer->state) {
@@ -161,7 +174,7 @@ void lexer_process_char(struct lexer_t *lexer, char c)
             lexer_ampersand(lexer, c);
             return;
         case lexer_state_double_ampersand:
-            /* TODO */
+            lexer_double_ampersand(lexer, c);
             return;
 
         case lexer_state_greater:
