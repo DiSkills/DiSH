@@ -46,7 +46,15 @@ static void lexer_initial(struct lexer_t *lexer, char c)
             return;
 
         case '<':
+            str_append(&lexer->buffer, c);
+            lexer_add_token(lexer, token_type_stdin_redirection);
+            return;
+
         case ';':
+            str_append(&lexer->buffer, c);
+            lexer_add_token(lexer, token_type_sequential_execution);
+            return;
+
         case '(':
         case ')':
             str_append(&lexer->buffer, c);
@@ -67,19 +75,24 @@ static void lexer_initial(struct lexer_t *lexer, char c)
 
         case '|':
             lexer->state = lexer_state_pipe;
-            break;
+            str_append(&lexer->buffer, c);
+            return;
+
         case '&':
             lexer->state = lexer_state_ampersand;
-            break;
+            str_append(&lexer->buffer, c);
+            return;
+
         case '>':
             lexer->state = lexer_state_greater;
-            break;
+            str_append(&lexer->buffer, c);
+            return;
 
         default:
             lexer->state = lexer_state_reading_word;
+            str_append(&lexer->buffer, c);
+            return;
     }
-
-    str_append(&lexer->buffer, c);
 }
 
 
@@ -90,7 +103,7 @@ static void lexer_pipe(struct lexer_t *lexer, char c)
         str_append(&lexer->buffer, c);
     } else {
         lexer->state = lexer_state_initial;
-        lexer_add_token(lexer, token_type_delimiter);
+        lexer_add_token(lexer, token_type_pipeline);
         lexer_process_char(lexer, c);
     }
 }
@@ -103,7 +116,7 @@ static void lexer_double_pipe(struct lexer_t *lexer, char c)
         lexer->errno = lexer_error_delimiter;
     } else {
         lexer->state = lexer_state_initial;
-        lexer_add_token(lexer, token_type_delimiter);
+        lexer_add_token(lexer, token_type_or);
         lexer_process_char(lexer, c);
     }
 }
@@ -116,7 +129,7 @@ static void lexer_ampersand(struct lexer_t *lexer, char c)
         str_append(&lexer->buffer, c);
     } else {
         lexer->state = lexer_state_initial;
-        lexer_add_token(lexer, token_type_delimiter);
+        lexer_add_token(lexer, token_type_background);
         lexer_process_char(lexer, c);
     }
 }
@@ -129,7 +142,7 @@ static void lexer_double_ampersand(struct lexer_t *lexer, char c)
         lexer->errno = lexer_error_delimiter;
     } else {
         lexer->state = lexer_state_initial;
-        lexer_add_token(lexer, token_type_delimiter);
+        lexer_add_token(lexer, token_type_and);
         lexer_process_char(lexer, c);
     }
 }
@@ -142,7 +155,7 @@ static void lexer_greater(struct lexer_t *lexer, char c)
         str_append(&lexer->buffer, c);
     } else {
         lexer->state = lexer_state_initial;
-        lexer_add_token(lexer, token_type_delimiter);
+        lexer_add_token(lexer, token_type_stdout_redirection);
         lexer_process_char(lexer, c);
     }
 }
@@ -155,7 +168,7 @@ static void lexer_double_greater(struct lexer_t *lexer, char c)
         lexer->errno = lexer_error_delimiter;
     } else {
         lexer->state = lexer_state_initial;
-        lexer_add_token(lexer, token_type_delimiter);
+        lexer_add_token(lexer, token_type_stdout_redirection_append);
         lexer_process_char(lexer, c);
     }
 }

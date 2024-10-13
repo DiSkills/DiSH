@@ -55,25 +55,26 @@ static void test_initial_ignoring_tab()
 }
 
 
-static void test_initial_adding_delimiter_less()
+static void test_initial_adding_stdin_redirection()
 {
     lexer_process_char(&lexer, '<');
 
     TEST_ASSERT_EQUAL_INT(lexer_state_initial, lexer.state);
     TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
     TEST_ASSERT_LEXER_BUFFER(lexer, 0, str_min_size, "");
-    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "<", token_type_delimiter);
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "<", token_type_stdin_redirection);
 }
 
 
-static void test_initial_adding_delimiter_semicolon()
+static void test_initial_adding_sequential_execution()
 {
     lexer_process_char(&lexer, ';');
 
     TEST_ASSERT_EQUAL_INT(lexer_state_initial, lexer.state);
     TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
     TEST_ASSERT_LEXER_BUFFER(lexer, 0, str_min_size, "");
-    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, ";", token_type_delimiter);
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, ";",
+            token_type_sequential_execution);
 }
 
 
@@ -190,7 +191,7 @@ static void test_pipe_to_double_pipe()
 }
 
 
-static void test_pipe_adding_delimiter()
+static void test_pipe_adding_pipeline()
 {
     lexer_set_state(&lexer, lexer_state_pipe, lexer_error_noerror, "|");
     lexer_process_char(&lexer, 'a');
@@ -198,7 +199,7 @@ static void test_pipe_adding_delimiter()
     TEST_ASSERT_EQUAL_INT(lexer_state_reading_word, lexer.state);
     TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
     TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "a");
-    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "|", token_type_delimiter);
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "|", token_type_pipeline);
 }
 /* ======================================================================== */
 
@@ -217,7 +218,7 @@ static void test_double_pipe_to_error()
 }
 
 
-static void test_double_pipe_adding_delimiter()
+static void test_double_pipe_adding_or()
 {
     lexer_set_state(&lexer, lexer_state_double_pipe,
             lexer_error_noerror, "||");
@@ -226,7 +227,7 @@ static void test_double_pipe_adding_delimiter()
     TEST_ASSERT_EQUAL_INT(lexer_state_initial, lexer.state);
     TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
     TEST_ASSERT_LEXER_BUFFER(lexer, 0, str_min_size, "");
-    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "||", token_type_delimiter);
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "||", token_type_or);
 }
 /* ======================================================================== */
 
@@ -244,7 +245,7 @@ static void test_ampersand_to_double_ampersand()
 }
 
 
-static void test_ampersand_adding_delimiter()
+static void test_ampersand_adding_background()
 {
     lexer_set_state(&lexer, lexer_state_ampersand, lexer_error_noerror, "&");
     lexer_process_char(&lexer, '\\');
@@ -252,7 +253,7 @@ static void test_ampersand_adding_delimiter()
     TEST_ASSERT_EQUAL_INT(lexer_state_escaping_in_word, lexer.state);
     TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
     TEST_ASSERT_LEXER_BUFFER(lexer, 0, str_min_size, "");
-    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "&", token_type_delimiter);
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "&", token_type_background);
 }
 /* ======================================================================== */
 
@@ -271,7 +272,7 @@ static void test_double_ampersand_to_error()
 }
 
 
-static void test_double_ampersand_adding_delimiter()
+static void test_double_ampersand_adding_and()
 {
     lexer_set_state(&lexer, lexer_state_double_ampersand,
             lexer_error_noerror, "&&");
@@ -280,7 +281,7 @@ static void test_double_ampersand_adding_delimiter()
     TEST_ASSERT_EQUAL_INT(lexer_state_reading_string, lexer.state);
     TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
     TEST_ASSERT_LEXER_BUFFER(lexer, 0, str_min_size, "");
-    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "&&", token_type_delimiter);
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, "&&", token_type_and);
 }
 /* ======================================================================== */
 
@@ -298,7 +299,7 @@ static void test_greater_to_double_greater()
 }
 
 
-static void test_greater_adding_delimiter()
+static void test_greater_adding_stdout_redirection()
 {
     lexer_set_state(&lexer, lexer_state_greater, lexer_error_noerror, ">");
     lexer_process_char(&lexer, '|');
@@ -306,7 +307,7 @@ static void test_greater_adding_delimiter()
     TEST_ASSERT_EQUAL_INT(lexer_state_pipe, lexer.state);
     TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
     TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "|");
-    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, ">", token_type_delimiter);
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, ">", token_type_stdout_redirection);
 }
 /* ======================================================================== */
 
@@ -325,7 +326,7 @@ static void test_double_greater_to_error()
 }
 
 
-static void test_double_greater_adding_delimiter()
+static void test_double_greater_adding_stdout_redirection_append()
 {
     lexer_set_state(&lexer, lexer_state_double_greater,
             lexer_error_noerror, ">>");
@@ -334,7 +335,8 @@ static void test_double_greater_adding_delimiter()
     TEST_ASSERT_EQUAL_INT(lexer_state_reading_word, lexer.state);
     TEST_ASSERT_EQUAL_INT(lexer_error_noerror, lexer.errno);
     TEST_ASSERT_LEXER_BUFFER(lexer, 1, str_min_size, "a");
-    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, ">>", token_type_delimiter);
+    TEST_ASSERT_LEXER_TOKENS_TAIL(lexer, ">>",
+            token_type_stdout_redirection_append);
 }
 /* ======================================================================== */
 
@@ -563,8 +565,8 @@ int main()
     RUN_TEST(test_initial_ignoring_space);
     RUN_TEST(test_initial_ignoring_tab);
 
-    RUN_TEST(test_initial_adding_delimiter_less);
-    RUN_TEST(test_initial_adding_delimiter_semicolon);
+    RUN_TEST(test_initial_adding_stdin_redirection);
+    RUN_TEST(test_initial_adding_sequential_execution);
     RUN_TEST(test_initial_adding_delimiter_left_parenthesis);
     RUN_TEST(test_initial_adding_delimiter_right_parenthesis);
 
@@ -580,32 +582,32 @@ int main()
 
 /* ================================= pipe ================================= */
     RUN_TEST(test_pipe_to_double_pipe);
-    RUN_TEST(test_pipe_adding_delimiter);
+    RUN_TEST(test_pipe_adding_pipeline);
 /* ======================================================================== */
 
 /* ============================= double pipe ============================== */
     RUN_TEST(test_double_pipe_to_error);
-    RUN_TEST(test_double_pipe_adding_delimiter);
+    RUN_TEST(test_double_pipe_adding_or);
 /* ======================================================================== */
 
 /* ============================== ampersand =============================== */
     RUN_TEST(test_ampersand_to_double_ampersand);
-    RUN_TEST(test_ampersand_adding_delimiter);
+    RUN_TEST(test_ampersand_adding_background);
 /* ======================================================================== */
 
 /* =========================== double ampersand =========================== */
     RUN_TEST(test_double_ampersand_to_error);
-    RUN_TEST(test_double_ampersand_adding_delimiter);
+    RUN_TEST(test_double_ampersand_adding_and);
 /* ======================================================================== */
 
 /* ================================ greater =============================== */
     RUN_TEST(test_greater_to_double_greater);
-    RUN_TEST(test_greater_adding_delimiter);
+    RUN_TEST(test_greater_adding_stdout_redirection);
 /* ======================================================================== */
 
 /* ============================ double greater ============================ */
     RUN_TEST(test_double_greater_to_error);
-    RUN_TEST(test_double_greater_adding_delimiter);
+    RUN_TEST(test_double_greater_adding_stdout_redirection_append);
 /* ======================================================================== */
 
 /* =========================== escaping in word =========================== */

@@ -3,7 +3,18 @@
 
 enum token_type_t {
     token_type_word,
-    token_type_delimiter
+
+    token_type_delimiter,
+
+    token_type_stdin_redirection,
+    token_type_stdout_redirection,
+    token_type_stdout_redirection_append,
+    token_type_pipeline,
+
+    token_type_sequential_execution,
+    token_type_background,
+    token_type_or,
+    token_type_and
 };
 
 struct token_t {
