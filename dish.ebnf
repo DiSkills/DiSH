@@ -18,8 +18,8 @@
 
 <simple_command> ::= <word> (<simple_command_element>)*
 
-<list0> ::= <list1> '&' '\n' |
-            <list1> ';' '\n'
+<list0> ::= <list1> '&' |
+            <list1> ';'
 
 <list1> ::= <list1> '&' <list1> |
             <list1> ';' <list1> |
@@ -28,7 +28,10 @@
             <pipeline>
 
 <pipeline> ::= <pipeline> '|' <pipeline> |
-               <simple_command>
+               <simple_command> |
+               <subshell>
 
-<command> ::= <list1> '\n' |
+<subshell> ::= '(' <command> ')' (<redirection>)*
+
+<command> ::= <list1> |
               <list0>
