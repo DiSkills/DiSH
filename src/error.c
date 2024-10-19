@@ -13,6 +13,8 @@ const char error_cd_many_args[] = "cd: too many arguments";
 const char error_env_many_args[] = "env: too many arguments";
 const char error_env_novariable[] = "env: no variable";
 
+const char error_is_loader[] = "l: incorrect number of arguments";
+
 
 void print_error(const char *error)
 {

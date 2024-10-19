@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +7,7 @@
 
 #include "cmd.h"
 #include "error.h"
+#include "message.h"
 
 
 static void wordlist_to_argv(char **argv, struct wordlist_t *wordlist)
@@ -124,6 +126,36 @@ static void print_env(struct cmd_t *cmd)
 }
 
 
+static void is_loader(struct cmd_t *cmd)
+{
+    int fd;
+    const char *s;
+    unsigned short fs;
+
+    if (cmd->argc != 2) {
+        print_error(error_is_loader);
+        return;
+    }
+
+    fd = open(cmd->argv[1], O_RDONLY);
+    if (fd == -1) {
+        perror(cmd->argv[1]);
+        return;
+    }
+
+    lseek(fd, 510, SEEK_SET);
+    read(fd, &fs, sizeof(fs));
+    close(fd);
+
+    if (fs == 0xaa55) {
+        s = msg_is_loader;
+    } else {
+        s = msg_isn_loader;
+    }
+    printf("%s\n", s);
+}
+
+
 void cmd_exec(struct cmd_t *cmd)
 {
     if (!cmd->name) {
@@ -136,6 +168,8 @@ void cmd_exec(struct cmd_t *cmd)
         exit(0);
     } else if (strcmp(cmd->name, ":e") == 0) {
         print_env(cmd);
+    } else if (strcmp(cmd->name, ":l") == 0) {
+        is_loader(cmd);
     } else {
         exec(cmd);
     }

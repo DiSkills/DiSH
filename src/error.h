@@ -10,6 +10,8 @@ extern const char error_cd_many_args[];
 extern const char error_env_many_args[];
 extern const char error_env_novariable[];
 
+extern const char error_is_loader[];
+
 void print_error(const char *error);
 
 #endif
