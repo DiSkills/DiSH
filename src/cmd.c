@@ -100,6 +100,30 @@ static void exec(struct cmd_t *cmd)
 }
 
 
+static void print_env(struct cmd_t *cmd)
+{
+    const char *env;
+    
+    cmd->pid = 0;
+    cmd->code = 1;
+    cmd->state = cmd_state_exited;
+
+    if (cmd->argc > 2) {
+        print_error(error_env_many_args);
+        return;
+    }
+
+    env = getenv(cmd->argv[1]);
+    if (!env) {
+        print_error(error_env_novariable);
+        return;
+    }
+
+    printf("%s\n", env);
+    cmd->code = 0;
+}
+
+
 void cmd_exec(struct cmd_t *cmd)
 {
     if (!cmd->name) {
@@ -108,6 +132,10 @@ void cmd_exec(struct cmd_t *cmd)
 
     if (strcmp(cmd->name, "cd") == 0) {
         cd(cmd);
+    } else if (strcmp(cmd->name, ":q") == 0 || strcmp(cmd->name, "exit") == 0) {
+        exit(0);
+    } else if (strcmp(cmd->name, ":e") == 0) {
+        print_env(cmd);
     } else {
         exec(cmd);
     }

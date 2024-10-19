@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <signal.h>
 
 #include "cmd.h"
 #include "error.h"
@@ -24,10 +25,18 @@ static void line_exec(struct line_t *line)
 }
 
 
+void sig_handler()
+{
+    printf("Configuration reloaded\n");
+}
+
+
 int main()
 {
     int c;
     struct line_t line;
+
+    signal(SIGHUP, sig_handler);
 
     line_init(&line);
     printf("%s ", msg_prompt);
