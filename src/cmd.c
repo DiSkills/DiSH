@@ -110,8 +110,8 @@ static void print_env(struct cmd_t *cmd)
     cmd->code = 1;
     cmd->state = cmd_state_exited;
 
-    if (cmd->argc > 2) {
-        print_error(error_env_many_args);
+    if (cmd->argc != 2) {
+        print_error(error_env_args);
         return;
     }
 
