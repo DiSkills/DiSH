@@ -10,6 +10,8 @@ bool Lexer::IsSpecialChar(char c)
     case '<':
     case '(':
     case ')':
+    case EOF:
+    case '\n':
         return true;
     }
     return false;
@@ -66,6 +68,11 @@ Token *Lexer::ScanLexeme()
 Token *Lexer::Scan()
 {
     SkipSpaces();
+    if (peek == EOF || peek == '\n') {
+        char tag = peek;
+        ResetPeek();
+        return new Token(tag);
+    }
     Token *token = ScanOperator();
     if (token) {
         return token;

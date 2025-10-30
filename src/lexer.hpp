@@ -60,7 +60,7 @@ private:
     Token *ScanLexeme();
     Token *ScanOperator();
 
-    static bool IsSpace(char c) { return c == ' ' || c == '\t' || c == '\n'; }
+    static bool IsSpace(char c) { return c == ' ' || c == '\t'; }
     static bool IsSpecialChar(char c);
 private:
     Lexer(const Lexer &);
