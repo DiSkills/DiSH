@@ -1,9 +1,22 @@
 # DiSH is a simple command interpreter
 
-### Features:
-  - [x] Launching external programs
-  - [x] cd command
+## TODO
+- [ ] Lexer quotes mode
+- [ ] Parser
+- [ ] Executor
 
-#### Special chars:
-  * " - toggles the argument splitting mode (text inside is one argument)
-  * \\ - escapes the next char (" or \\)
+## Lexer
+### Token table
+| Token | Lexeme |
+| --- | --- |
+| BACKGROUND | & |
+| SEQUENCE | ; |
+| INPUT_REDIRECTION | < |
+| OUTPUT_REDIRECTION | > |
+| APPEND_REDIRECTION | >> |
+| PIPE | \| |
+| LBRACKET | ( |
+| RBRACKET | ) |
+| AND | && |
+| OR | \|\| |
+| WORD | everything else |
