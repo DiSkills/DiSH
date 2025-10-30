@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#include "string_buffer.hpp"
+
 enum {
     BACKGROUND = '&',
     SEQUENCE = ';',
@@ -43,21 +45,26 @@ private:
 
 class Lexer {
     int peek;
-    /* TODO: buffer */
+    StringBuffer lexeme;
 public:
     Lexer() : peek(' ') {}
     Token *Scan();
 private:
     void GetChar() { peek = getchar(); }
     bool GetChar(char c)
-        { GetChar(); if (peek != c) return false; peek = ' '; return true; }
+        { GetChar(); if (peek != c) return false; ResetPeek(); return true; }
+    void ResetPeek() { peek = ' '; }
 
+    Token *GetOperatorToken() const;
     void SkipSpaces() { while (IsSpace(peek)) GetChar(); }
     Token *ScanLexeme();
     Token *ScanOperator();
 
     static bool IsSpace(char c) { return c == ' ' || c == '\t' || c == '\n'; }
     static bool IsSpecialChar(char c);
+private:
+    Lexer(const Lexer &);
+    void operator=(const Lexer &);
 };
 
 #endif

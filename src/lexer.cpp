@@ -15,24 +15,9 @@ bool Lexer::IsSpecialChar(char c)
     return false;
 }
 
-Token *Lexer::ScanOperator()
+Token *Lexer::GetOperatorToken() const
 {
     switch (peek) {
-    case '&':
-        if (GetChar('&')) {
-            return new Token(AND);
-        }
-        return new Token(BACKGROUND);
-    case '>':
-        if (GetChar('>')) {
-            return new Token(APPEND_REDIRECTION);
-        }
-        return new Token(OUTPUT_REDIRECTION);
-    case '|':
-        if (GetChar('|')) {
-            return new Token(OR);
-        }
-        return new Token(PIPE);
     case ';':
         return new Token(SEQUENCE);
     case '<':
@@ -45,16 +30,38 @@ Token *Lexer::ScanOperator()
     return 0;
 }
 
-#if 0
+Token *Lexer::ScanOperator()
+{
+    switch (peek) {
+    case '&':
+        if (GetChar('&'))
+            return new Token(AND);
+        return new Token(BACKGROUND);
+    case '>':
+        if (GetChar('>'))
+            return new Token(APPEND_REDIRECTION);
+        return new Token(OUTPUT_REDIRECTION);
+    case '|':
+        if (GetChar('|'))
+            return new Token(OR);
+        return new Token(PIPE);
+    }
+    Token *token = GetOperatorToken();
+    if (token) {
+        ResetPeek();
+    }
+    return token;
+}
+
 Token *Lexer::ScanLexeme()
 {
+    lexeme.Clear();
     do {
-        /* putchar(peek); */
+        lexeme.Append(peek);
         GetChar();
     } while (!IsSpace(peek) && !IsSpecialChar(peek));
-    /* return 0; */
+    return new Word(lexeme.GetString());
 }
-#endif
 
 Token *Lexer::Scan()
 {
