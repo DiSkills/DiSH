@@ -26,6 +26,7 @@ private:
 #endif
 
     SimpleCommand *ParseSimpleCommand();
+    Pipeline *ParsePipeline();
 };
 
 #endif

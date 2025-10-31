@@ -30,4 +30,24 @@ public:
     virtual void Execute() const;
 };
 
+class Pipeline : public Node {
+public:
+    struct Item {
+        SimpleCommand *cmd;
+        Item *next;
+    public:
+        Item(SimpleCommand *cmd, Item *next = 0) : cmd(cmd), next(next) {}
+        ~Item() { delete cmd; }
+    };
+private:
+    Item *commands;
+    unsigned int len;
+public:
+    Pipeline(Item *commands, unsigned int len)
+        : commands(commands), len(len) {}
+    virtual ~Pipeline();
+
+    virtual void Execute() const;
+};
+
 #endif

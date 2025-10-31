@@ -16,5 +16,22 @@ void SimpleCommand::Execute() const
     for (Argument *p = args; p; p = p->next) {
         printf(" [%s]", p->arg->GetLexeme());
     }
-    putchar('\n');
+}
+
+Pipeline::~Pipeline()
+{
+    while (commands) {
+        Item *tmp = commands;
+        commands = commands->next;
+        delete tmp;
+    }
+}
+
+void Pipeline::Execute() const
+{
+    commands->cmd->Execute();
+    for (Item *p = commands->next; p; p = p->next) {
+        printf(" | ");
+        p->cmd->Execute();
+    }
 }
