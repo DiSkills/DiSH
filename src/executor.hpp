@@ -14,6 +14,9 @@ public:
     struct Argument {
         Word *arg;
         Argument *next;
+    public:
+        Argument(Word *arg, Argument *next = 0) : arg(arg), next(next) {}
+        ~Argument() { delete arg; }
     };
 private:
     Word *name;

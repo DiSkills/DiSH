@@ -6,7 +6,6 @@ SimpleCommand::~SimpleCommand()
     while (args) {
         Argument *tmp = args;
         args = args->next;
-        delete tmp->arg;
         delete tmp;
     }
 }
