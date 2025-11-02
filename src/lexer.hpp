@@ -57,7 +57,7 @@ private:
 
     Token *GetOperatorToken() const;
     void SkipSpaces() { while (IsSpace(peek)) GetChar(); }
-    Token *ScanLexeme();
+    Word *ScanLexeme();
     Token *ScanOperator();
 
     static bool IsSpace(char c) { return c == ' ' || c == '\t'; }

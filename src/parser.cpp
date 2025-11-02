@@ -1,9 +1,9 @@
 #include "parser.hpp"
 
-Node *Parser::Run()
+Pipeline *Parser::Run()
 {
     SkipEmptyLines();
-    Node *node = ParsePipeline();
+    Pipeline *node = ParsePipeline();
     if (look->GetTag() == '\n') {
         return node;
     }
@@ -15,28 +15,28 @@ Node *Parser::Run()
 
 SimpleCommand *Parser::ParseSimpleCommand()
 {
-    if (look->GetTag() == WORD) {
-        Word *name = static_cast<Word *>(look);
-
-        unsigned int len = 0;
-        SimpleCommand::Argument *head = 0, *tail = 0;
-
-        for (Move(); look->GetTag() == WORD; Move()) {
-            SimpleCommand::Argument *tmp = new SimpleCommand::Argument(
-                static_cast<Word *>(look)
-            );
-            if (tail) {
-                tail->next = tmp;
-            } else {
-                head = tmp;
-            }
-            tail = tmp;
-
-            len++;
-        }
-        return new SimpleCommand(name, head, len);
+    if (look->GetTag() != WORD) {
+        return 0;
     }
-    return 0;
+    Word *name = static_cast<Word *>(look);
+
+    unsigned int len = 0;
+    SimpleCommand::Argument *head = 0, *tail = 0;
+
+    for (Move(); look->GetTag() == WORD; Move()) {
+        SimpleCommand::Argument *tmp = new SimpleCommand::Argument(
+            static_cast<Word *>(look)
+        );
+        if (tail) {
+            tail->next = tmp;
+        } else {
+            head = tmp;
+        }
+        tail = tmp;
+
+        len++;
+    }
+    return new SimpleCommand(name, head, len);
 }
 
 Pipeline *Parser::ParsePipeline()
@@ -48,8 +48,7 @@ Pipeline *Parser::ParsePipeline()
     Pipeline::Item *head = new Pipeline::Item(cmd);
     Pipeline::Item *tail = head;
     unsigned int len = 1;
-    while (look->GetTag() == PIPE) {
-        Move();
+    while (Match(PIPE)) {
         cmd = ParseSimpleCommand();
         if (!cmd) {
             goto error;
