@@ -20,3 +20,42 @@
 | AND | && |
 | OR | \|\| |
 | WORD | everything else |
+
+## Parser
+
+### Priority table
+| Priority | Operator |
+| --- | --- |
+| 0 | () |
+| 1 | \| |
+| 2 | < > >> |
+| 3 | && \|\| |
+| 4 | ; & |
+
+### Grammar
+    COMMAND_LINE -> SEQUENCE
+              | SEQUENCE ;
+              | SEQUENCE &
+    SEQUENCE -> SEQUENCE ; ANDOR
+              | SEQUENCE & ANDOR
+              | ANDOR
+    ANDOR -> ANDOR && COMMAND
+           | ANDOR || COMMAND
+           | COMMAND
+    COMMAND -> PIPELINE INPUT OUTPUT
+    INPUT -> < word
+           | e
+    OUTPUT -> > word
+            | >> word
+            | e
+    PIPELINE -> PIPELINE | SIMPLE_COMMAND
+              | SIMPLE_COMMAND
+    SIMPLE_COMMAND -> (SEQUENCE)
+                    | word ARGS
+    ARGS -> ARGS word
+          | e
+
+### BNF
+    START ::= PIPELINE "\n"
+    PIPELINE ::= SIMPLE_COMMAND ("|" SIMPLE_COMMAND)*
+    SIMPLE_COMMAND ::= word (word)*

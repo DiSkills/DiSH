@@ -55,7 +55,7 @@ Token *Lexer::ScanOperator()
     return token;
 }
 
-Token *Lexer::ScanLexeme()
+Word *Lexer::ScanLexeme()
 {
     lexeme.Clear();
     do {
