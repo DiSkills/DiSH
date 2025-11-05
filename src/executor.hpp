@@ -3,13 +3,7 @@
 
 #include "lexer.hpp"
 
-class Node {
-public:
-    virtual ~Node() {}
-    virtual void Execute() const = 0;
-};
-
-class SimpleCommand : public Node {   
+class SimpleCommand {   
 public:
     struct Argument {
         Word *arg;
@@ -25,12 +19,11 @@ private:
 public:
     SimpleCommand(Word *name, Argument *args, unsigned int len)
         : name(name), args(args), len(len) {}
-    virtual ~SimpleCommand();
-
-    virtual void Execute() const;
+    ~SimpleCommand();
+    void Execute() const;
 };
 
-class Pipeline : public Node {
+class Pipeline {
 public:
     struct Item {
         SimpleCommand *cmd;
@@ -45,9 +38,21 @@ private:
 public:
     Pipeline(Item *commands, unsigned int len)
         : commands(commands), len(len) {}
-    virtual ~Pipeline();
+    ~Pipeline();
+    int Execute() {
+        if (len == 1)
+            return ExecuteSimplestCase();
+        return ExecuteCompositeCase();
+    }
+    int ExecuteSimplestCase() const;
+    int ExecuteCompositeCase() const;
 
-    virtual void Execute() const;
+    int ExecuteFirstProcess(SimpleCommand *cmd, int fdin, int fdout) const;
+    int ExecuteMiddleProcess(SimpleCommand *cmd, int fd,
+            int fdin, int fdout) const;
+    int ExecuteLastProcess(SimpleCommand *cmd, int fdin) const;
+
+    void Wait() const;
 };
 
 #endif

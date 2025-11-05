@@ -54,3 +54,8 @@
                     | word ARGS
     ARGS -> ARGS word
           | e
+
+### BNF
+    START ::= PIPELINE "\n"
+    PIPELINE ::= SIMPLE_COMMAND ("|" SIMPLE_COMMAND)*
+    SIMPLE_COMMAND ::= word (word)*
