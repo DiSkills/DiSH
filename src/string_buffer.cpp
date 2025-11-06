@@ -6,9 +6,7 @@ void StringBuffer::Resize()
 {
     capacity += INIT_STRING_BUFFER_SIZE;
     char *new_buf = new char[capacity];
-    for (unsigned int i = 0; i < size; i++) {
-        new_buf[i] = buf[i];
-    }
+    memcpy(new_buf, buf, size);
     if (buf) {
         delete[] buf;
     }
