@@ -1,5 +1,4 @@
-build/*
-bin/*
+build
 tags
-.cache/
 compile_commands.json
+.cache

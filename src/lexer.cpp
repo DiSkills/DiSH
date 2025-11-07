@@ -1,5 +1,7 @@
 #include "lexer.hpp"
 
+using namespace Tokens;
+
 bool Lexer::IsSpecialChar(char c)
 {
     switch (c) {
@@ -55,7 +57,7 @@ Token *Lexer::ScanOperator()
     return token;
 }
 
-Token *Lexer::ScanLexeme()
+Word *Lexer::ScanLexeme()
 {
     lexeme.Clear();
     do {
@@ -68,10 +70,12 @@ Token *Lexer::ScanLexeme()
 Token *Lexer::Scan()
 {
     SkipSpaces();
-    if (peek == EOF || peek == '\n') {
-        char tag = peek;
+    if (peek == EOF) {
+        return new Token(END);
+    }
+    if (peek == '\n') {
         ResetPeek();
-        return new Token(tag);
+        return new Token(NEWLINE);
     }
     Token *token = ScanOperator();
     if (token) {

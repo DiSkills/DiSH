@@ -2,26 +2,25 @@ name: DiShell Tests
 
 on:
   push:
-    branches:
-      - master
-      - 'releases/**'
+    branches: [ "main" ]
   pull_request:
 
+env:
+  BUILD_TYPE: Debug
+
 jobs:
-  tests:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-      - name: Updating submodules
-        run: make submodules
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_TESTS=ON
 
-      - name: Setting up a Unity testing framework
-        run: make unity
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-      - name: Make unittests
-        run: make unittests
-
-      - name: Make functests
-        run: make functests
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      run: ctest -C ${{env.BUILD_TYPE}}
