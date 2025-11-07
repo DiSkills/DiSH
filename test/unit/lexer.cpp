@@ -83,7 +83,7 @@ INSTANTIATE_TEST_SUITE_P(
             new ExpectedWord("123"), new Token(NEWLINE),
             new Token(NEWLINE), new Token(END)
         }),
-        TestParam("\n|||&&;&><>,test.h", {
+        TestParam("\n||&&;&><>,test.h", {
             new Token(NEWLINE), new Token(OR), new Token(PIPE),
             new Token(AND), new Token(SEQUENCE), new Token(BACKGROUND),
             new Token(OUTPUT_REDIRECTION), new Token(INPUT_REDIRECTION),
