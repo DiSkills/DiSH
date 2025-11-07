@@ -1,11 +1,26 @@
 # DiSH is a simple command interpreter
+![C++](https://img.shields.io/badge/C%2B%2B-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+![CMake](https://img.shields.io/badge/CMake-064F8C?style=for-the-badge&logo=cmake&logoColor=white)
+![GitHub-Actions](https://img.shields.io/badge/Github%20Actions-282a2e?style=for-the-badge&logo=githubactions&logoColor=367cfe)
 
-## TODO
-- [ ] Lexer quotes mode
+## Tasks
+- [x] Lexer
+    - [x] Recognize tokens
+        - [x] UnitTests
+    - [ ] Quotes mode
 - [ ] Parser
+    - [ ] Simple command
+        - [ ] UnitTests
+    - [ ] Pipeline
+        - [ ] UnitTests
 - [ ] Executor
+    - [ ] Simple command
+        - [ ] Python tests
+    - [ ] Pipeline
+        - [ ] Python tests
 
 ## Lexer
+
 ### Token table
 | Token | Lexeme |
 | --- | --- |
